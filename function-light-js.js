@@ -36,4 +36,36 @@ function identity(v) {
 var words = "   Now is the time for all...  ".split(/\s|\b/)
 // ["","Now","is","the","time","for","all","...",""]
 words.filter(identity)
-//Because identity(..) simply returns the value passed to it, JS coerces each value into either true or false, and that determines whether to keep or exclude each value in the final array.
+//Because identity(..) simply returns the value passed to it, JScoerces each value into either true or false, and that determines whether to keep or exclude each value in the final array.
+
+// gather and spread arguments
+function apply(fn) {
+    return function spreadFn(argsArr) {
+        return fn(...argsArr)
+    }
+}
+
+function unapply(fn) {
+    return function gatheredFn(...argsArr) {
+        return fn(argsArr)
+    }
+}
+
+
+function combineFirstTwo([v1, v2]) {
+    return v1 + v2
+}
+
+[1,2,3,4,5].reduce(unapply(combineFirstTwo))
+// 15
+
+//some now, some later
+//argument presetting
+
+function getPerson(data, callback) {
+    ajax('http://some.api/person', data, callback)
+}
+
+// One practice an FPer gets very used to is looking for patterns where we do the same sorts of things repeatedly, and trying to turn those actions into generic reusable utilities. 
+
+
