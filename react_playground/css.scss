@@ -1,0 +1,15 @@
+
+/*细细的滚动条*/
+&::-webkit-scrollbar {
+    width: 3px;
+}
+&::-webkit-scrollbar-thumb {
+    background-color: #b4b4b4;
+    border-radius: 4px;
+}
+&::-webkit-scrollbar-button {
+    display: none;
+}
+&::-webkit-scrollbar-track {
+    background-color: #f4f4f4;
+}

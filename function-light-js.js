@@ -69,3 +69,21 @@ function getPerson(data, callback) {
 // One practice an FPer gets very used to is looking for patterns where we do the same sorts of things repeatedly, and trying to turn those actions into generic reusable utilities. 
 
 
+//partial apply
+//When the partiallyApplied(..) function is later executed somewhere else in your program, it uses the closed over fn to execute the original function, first providing any of the (closed over) presetArgs partial application arguments, then any further laterArgs arguments.
+
+//closure!!
+function partial(fn, ...presetArgs) {
+    return function partiallyApplied(...laterArgs) {
+        return fn(...presetArgs, ...laterArgs);
+    };
+}
+
+var getPerson = partial(ajax, 'http://some.api/person')
+
+
+
+
+
+
+
