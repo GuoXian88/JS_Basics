@@ -69,3 +69,71 @@ function getPerson(data, callback) {
 // One practice an FPer gets very used to is looking for patterns where we do the same sorts of things repeatedly, and trying to turn those actions into generic reusable utilities. 
 
 
+
+
+var getPerson = partial(ajax, 'http://some.api/person');
+
+//version 1
+var getCurrentUser = partial(ajax, 'http://some.api/person', {user: CURRENT_USER_ID});
+
+
+//version 2   reuse getPerson!!
+var getCurrentUser = partial(getPerson, {user: CURRENT_USER_ID});
+
+// version 1
+var getCurrentUser = function partiallyApplied(...laterArgs) {
+    return ajax(
+        "http://some.api/person",
+        { user: CURRENT_USER_ID },
+        ...laterArgs
+    );
+};
+
+// version 2
+var getCurrentUser = function outerPartiallyApplied(...outerLaterArgs){
+    var getPerson = function innerPartiallyApplied(...innerLaterArgs){
+        return ajax( "http://some.api/person", ...innerLaterArgs );
+    };
+
+    return getPerson( { user: CURRENT_USER_ID }, ...outerLaterArgs );
+}
+
+
+//partial apply 使用
+
+function add( x,y ) {
+    return x + y
+}
+
+[1,2,3,4,5].map(partial(add, 3))
+// [4,5,6,7,8]
+
+
+//reversing arguments
+
+function reverseArgs(fn) {
+    return function argsReversed(...args) {
+        return fn(...args.reverse());
+    };
+}
+
+var cache = {}
+var cacheResult = reverseArgs(
+    partial(reverseArgs(ajax), function onResult(obj) {
+        cache[obj.id] = obj
+    })
+)
+// later:
+cacheResult( "http://some.api/person", { user: CURRENT_USER_ID } );
+
+function argsReversed(...args) {
+    return ajax(...args.reverse())
+}
+
+function partiallyApplied(...args) {
+    return argsReversed(cb, ...args)
+}
+
+function reverseAgain(...args) {
+    return partiallyApplied(...args.reverse())
+}
