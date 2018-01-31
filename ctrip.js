@@ -22,11 +22,18 @@ let rRemoveRoundBrackets = /\(([^)]+)\)/g,
     rRemoveTDTags = /(?i)<td[^>]*>/,
     rRemoveHTMLOpenTags = /<[^>]*>/,
     rRemoveHTMLCloseTags = /<\/[^>]*>/
+ 
+*/
+//trim leading and trailing spaces:
+sed -i 's/^[ \t]*//;s/[ \t]*$//'
 
+/*
 
 
 5.多程需要很多埋点字段设置成数组的形式
 
-6.
+6.fiddler
+
+7.
 
 */
