@@ -345,3 +345,75 @@ function curryProps(fn,arity = 1) {
     })( {} );
 }
 
+
+function spreadArgProps(
+    fn,
+    propOrder =
+        fn.toString()
+        .replace( /^(?:(?:function.*\(([^]*?)\))|(?:([^\(\)]+?)
+            \s*=>)|(?:\(([^]*?)\)\s*=>))[^]+$/, "$1$2$3" )
+        .split( /\s*,\s*/ )
+        .map( v => v.replace( /[=\s].*$/, "" ) )
+      ) {
+          return function spreadFn(argsObj){
+              return fn( ...propOrder.map( k => argsObj[k] ) );
+          };
+      }
+  
+  
+//No points
+//A popular style of coding in the FP world aims to reduce some of the visual clutter by removing unnecessary parameter-argument mapping. This style is formally called tacit programming, or more commonly: point-free style. The term "point" here is referring to a function's parameter input.
+
+
+["1","2","3"].map( unary( parseInt ) );
+// [1,2,3]
+
+function output(txt) {
+    console.log( txt );
+}
+
+function printIf( predicate, msg ) {
+    if (predicate( msg )) {
+        output( msg );
+    }
+}
+
+
+function isShortEnough(str) {
+    return str.length <= 5;
+}
+
+function isLongEnough(str) {
+    return !isShortEnough( str );
+}
+
+function not(predicate) {
+    return function negated(...args){
+        return !predicate( ...args );
+    };
+}
+
+var isLongEnough = not( isShortEnough );
+
+printIf( isLongEnough, msg2 );          // Hello World
+
+function when(predicate,fn) {
+    return function conditional(...args){
+        if (predicate( ...args )) {
+            return fn( ...args );
+        }
+    };
+}
+
+var printIf = uncurry( partialRight( when, output ) );
+
+var msg1 = "Hello";
+var msg2 = msg1 + " World";
+
+printIf( isShortEnough, msg1 );         // Hello
+printIf( isShortEnough, msg2 );
+
+printIf( isLongEnough, msg1 );
+printIf( isLongEnough, msg2 );          // Hello World
+
+
