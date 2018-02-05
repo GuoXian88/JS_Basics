@@ -117,3 +117,8 @@ console.log(y, typeof y)
 //The most common (and essentially unavoidable) form of side cause/effect is input/output (I/O). A program with no I/O is totally pointless, because its work cannot be observed in any way. Useful programs must at a minimum have output, and many also need input. Input is a side cause and output is a side effect.
 
 //If you work more in Node.js, you may more likely receive input from, and send output to, the file system, network connections, and/or the stdin/stdout streams.
+
+
+/*Referential transparency is the assertion that a function call could be replaced by its output value, and the overall program behavior wouldn't change.
+ 
+That result becomes kinda like a mental const declaration, which as you're reading you can transparently swap in and not spend any more mental energy working out.
