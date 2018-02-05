@@ -220,3 +220,5 @@ var simpleList = rememberNumbers( list );
 
 
 //Referential transparency is the assertion that a function call could be replaced by its output value, and the overall program behavior wouldn't change. In other words, it would be impossible to tell from the program's execution whether the function call was made or its return value was inlined in place of the function call.
+ 
+//That result becomes kinda like a mental const declaration, which as you're reading you can transparently swap in and not spend any more mental energy working out.

@@ -13,3 +13,11 @@
 &::-webkit-scrollbar-track {
     background-color: #f4f4f4;
 }
+
+/*A > B will only select B that are direct children to A (that is, there are no other elements inbetween).
+
+A B will select any B that are inside A, even if there are other elements between them.
+
+display: inline-block可以不换行
+
+*/
