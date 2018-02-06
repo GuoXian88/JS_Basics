@@ -222,3 +222,32 @@ var simpleList = rememberNumbers( list );
 //Referential transparency is the assertion that a function call could be replaced by its output value, and the overall program behavior wouldn't change. In other words, it would be impossible to tell from the program's execution whether the function call was made or its return value was inlined in place of the function call.
  
 //That result becomes kinda like a mental const declaration, which as you're reading you can transparently swap in and not spend any more mental energy working out.
+
+
+function safer_fetchUserData(userId,users) {
+    // simple, naive ES6+ shallow object copy, could also
+    // be done w/ various libs or frameworks
+    users = Object.assign( {}, users );
+
+    fetchUserData( userId );
+
+    // return the copied state
+    return users;
+
+
+    // ***********************
+
+    // original untouched impure function:
+    function fetchUserData(userId) {
+        ajax(
+            `http://some.api/user/${userId}`,
+            function onUserData(user){
+                users[userId] = user;
+            }
+        );
+    }
+}
+
+//safer_fetchUserData(..) is more pure, but is not strictly pure in that it still relies on the I/O of making an Ajax call. There's no getting around the fact that an Ajax call is an impure side effect, so we'll just leave that detail unaddressed.
+
+
