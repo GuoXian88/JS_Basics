@@ -1,0 +1,52 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#first {
+  height: 300px;
+}
+
+.london {
+  display: inline-block;
+  width: 10em;
+  height: 6em;
+  padding: 10px;
+  background: no-repeat center/80% url("./London.jpg");
+}
+
+#relative-london {
+  position: relative;
+  left: 20px;
+  top: 20px;
+}
+
+#absolute-london {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+}
+
+#main_container {
+  width: 400px;
+  margin: 20px auto;
+  border: 2px solid #cccccc;
+  padding: 5px;
+}
+
+.floated_box {
+  float: left;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #990000;
+  margin: 10px;
+}
+
+#main_container:after {
+  content: '.';
+  height: 0;
+  visibility: hidden;
+  display:block;
+  clear: both
+}

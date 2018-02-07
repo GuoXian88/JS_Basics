@@ -20,4 +20,43 @@ A B will select any B that are inside A, even if there are other elements betwee
 
 display: inline-block可以不换行
 
+1.CSS 三大概念: 浮动 定位 盒模型
+元素加背景，背景会应用于content + padding
+outline绘制在border之上不会影响页面布局
+width 和 height是指contend的宽高
+padding不能为负, margin可以为负
+box-sizing: border-box会把border也计算在内
+普通文档流中的div的margin会叠加（外和内都会）, 取最大的
+空元素的margin会和自身叠加
+但是行内框inline,浮动框或position: absolute框之间不会叠加
+
+定位：普通流，浮动，绝对定位
+修改行内元素尺寸的唯一方法是修改line-height或者水平border, padding , margin,还有就是将
+属性设置为display: inline-block
+
+position: relative元素还占据原来的空间,相对自己在文档流中的位置偏移进行定位,会覆盖其他的div
+
+position: absolute元素位置与文档流无关，不占据空间。其他元素的布局相当于
+绝对定位元素不存在一样
+绝对定位元素的位置相对于离它最近已经定位的祖先来定位，层叠可用z-index来控制显示
+position:fixed是绝对定位的一种,相对于viewport定位
+
+float的div移动直到碰到了包含它的div或者是另外一个float的div边缘
+float脱离文档流
+float不影响页面元素,但是inline元素会被浮云元素影响(压缩)
+清除浮动是让元素的某个方向没有浮云元素
+
+overflow: hidden或者auto会清除浮动
+
+
+
+
 */
+
+.clear:after {
+    content: '.';
+    height: 0;
+    visibility: hidden;
+    display:block;
+    clear: both
+}
