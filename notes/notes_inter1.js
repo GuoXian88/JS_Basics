@@ -84,7 +84,28 @@ CSS sprite
 
 - 配置 ETag：即If-None-Match: 上次 ETag 的内容。浏览器会发出请求询问服务端，资源是否过期；服务端发现,没有过期，直接返回一个状态码为304、正文为空的响应，告知浏览器使用本地缓存；如果资源有更新，服务端返回状态码 200、Etag 和正文。这个过程被称之为 HTTP 的协商缓存，通常也叫做弱缓存。
 
-- 添加 Expires 头：服务端通过响应头告诉浏览器，在什么时间之前（Expires）或在多长时间之内（Cache-Control: Max-age=xxx），不要再请求服务器了。这个机制我们通常称之为 HTTP 的强缓存。一般会对 CSS、JS、图片等资源使用强缓存，而入口文件（HTML）一般使用协商缓存或不缓存。
+- 添加 Expires 头：服务端通过响应头告诉浏览器，在什么时间之前（Expires）或在多长时间之内（Cache-Control: Max-age=xxx/no-cache/no-store），不要再请求服务器了。这个机制我们通常称之为 HTTP 的强缓存。一般会对 CSS、JS、图片等资源使用强缓存，而入口文件（HTML）一般使用协商缓存或不缓存。
+
+no-cache and no-store:
+I must clarify that no-cache does not mean do not cache. In fact, it means "revalidate with server" before using any cached response you may have, on every request.
+no-store is effectively the full do not cache directive and is intended to prevent storage of the representation in any form of cache whatsoever.
+这正是验证令牌（在 ETag 标头中指定）旨在解决的问题。服务器生成并返回的随机令牌通常是文件内容的哈希值或某个其他指纹。客户端不需要了解指纹是如何生成的，只需在下一次请求时将其发送至服务器。如果指纹仍然相同，则表示资源未发生变化，您就可以跳过下载。
+在上例中，客户端自动在“If-None-Match” HTTP 请求标头内提供 ETag 令牌。服务器根据当前资源核对令牌。如果它未发生变化，服务器将返回“304 Not Modified”响应，告知浏览器缓存中的响应未发生变化，可以再延用 120 秒。请注意，您不必再次下载响应，这节约了时间和带宽。
+作为网络开发者，您如何利用高效的重新验证？浏览器会替我们完成所有工作：它会自动检测之前是否指定了验证令牌，它会将验证令牌追加到发出的请求上，并且它会根据从服务器接收的响应在必要时更新缓存时间戳。我们唯一要做的就是确保服务器提供必要的 ETag 令牌。检查您的服务器文档中有无必要的配置标志。
+从性能优化的角度来说，最佳请求是无需与服务器通信的请求：您可以通过响应的本地副本消除所有网络延迟，以及避免数据传送的流量费用。为实现此目的，HTTP 规范允许服务器返回 Cache-Control 指令，这些指令控制浏览器和其他中间缓存如何缓存各个响应以及缓存多久。
+“no-cache”和“no-store”
+“no-cache”表示必须先与服务器确认返回的响应是否发生了变化，然后才能使用该响应来满足后续对同一网址的请求。因此，如果存在合适的验证令牌 (ETag)，no-cache 会发起往返通信来验证缓存的响应，但如果资源未发生变化，则可避免下载。
+
+相比之下，“no-store”则要简单得多。它直接禁止浏览器以及所有中间缓存存储任何版本的返回响应，例如，包含个人隐私数据或银行业务数据的响应。每次用户请求该资产时，都会向服务器发送请求，并下载完整的响应
+public and private:
+如果响应被标记为“public”，则即使它有关联的 HTTP 身份验证，甚至响应状态代码通常无法缓存，也可以缓存响应。大多数情况下，“public”不是必需的，因为明确的缓存信息（例如“max-age”）已表示响应是可以缓存的。
+相比之下，浏览器可以缓存“private”响应。不过，这些响应通常只为单个用户缓存，因此不允许任何中间缓存对其进行缓存。例如，用户的浏览器可以缓存包含用户私人信息的 HTML 网页，但 CDN 却不能缓存。
+所以，如何才能鱼和熊掌兼得：客户端缓存和快速更新？您可以在资源内容发生变化时更改它的网址，强制用户下载新响应。通常情况下，可以通过在文件名中嵌入文件的指纹或版本号来实现 - 例如 style.x234dff.css。
+
+
+301永久重定向
+302暂时重定向
+
 
 - AppCache：
 AppCache主要利用manifest 文本文件，告知浏览器被缓存的内容以及不缓存的内容
@@ -288,21 +309,76 @@ microtask queue 中的 task 会在事件循环的当前回合中执行，因此 
 click ajax setTimeout 的回调是都是 task, 同时，包裹在一个 script 标签中的js代码也是一个 task 确切说是 macrotask。
 
 所说的, ‘每个 Macro Task 结束后, 都要清空所有的 Micro Task‘. 引擎会遍历 Macro Task Queue, 对于每个 Macrotask 执行完毕后都要遍历执行 Tick Task Queue 的所有任务, 紧接着再遍历 Micro Task Queue 的所有任务. (这也解释了为什么 nextTick 会优于 Promise 执行)
-
+*/
 
 setTimeout(function () {
     console.log(5);
-    }, 0);
+}, 0);
 setImmediate(function() {
     console.log(6);
-    });
+});
 new Promise(function (resolve) {
     console.log(1);
     resolve();
     console.log(2);
-    }).then(function () {
+}).then(function () {
     console.log(4);
-    });
+});
 process.nextTick(function() {
     console.log(3);
-    });
+});
+
+//1,2,3,4,5,6
+
+//写一个Observe对象
+
+//写一个Promise
+
+//setMask考察CSS
+
+//英文文章统计频率最高的单词(注意tab，标点和换行)
+
+//csrf原理及防范
+
+//ctrip.com域名及子域名是否为携程
+
+//超过存储范围的两个数相加(string)
+
+//js私有变量，私有方法，继承
+
+//let fragment = document.createDocumentFragment();在ul下动态加1000个li
+//dom更新会重排和重绘，给出只重绘不重排的例子，哪个一定会导致哪个，什么会导致重排
+//因为文档片段存在于内存中，并不在DOM树中，所以将子元素插入到文档片段时不会引起页面回流(reflow)(对元素位置和几何上的计算)。因此，使用文档片段document fragments 通常会起到优化性能的作用(better performance)
+
+//react直出组件的生命周期
+//you have access to some great component lifecycle hooks in React. componentDidMount is one of the most useful, but it’s not going to be available when rendering on the server.
+
+//So things are different. But there’s always hope. Components are built on hope. You can add code to your component inside the constructor and componentWillMount. That is all:
+
+class OobiDoobBenooby extends React.Component {
+  componentWillMount() {
+    console.log('Will be called on the server...')
+  }
+}
+
+
+
+//浏览器事件的机制：capture and bulble
+//capture: A Boolean indicating that events of this type will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree.  
+//Events that are bubbling upward through the tree will not trigger a listener designated to use capture. Event bubbling and capturing are two ways of propagating events which occur in an element that is nested within another element, when both elements have registered a handle for that event. The event propagation mode determines the order in which elements receive the event.
+
+
+//react dom diff是dfs还是bfs?bfs
+
+//更新state的部分，所有会重新渲染吗
+
+//react如何构建dom树?
+//When you use React, at a single point in time you can think of the render() function as creating a tree of React elements. On the next state or props update, that render() function will return a different tree of React elements. React then needs to figure out how to efficiently update the UI to match the most recent tree.
+
+//immutable原理
+
+//grunt与webapck的区别
+
+//TCP三次握手
+
+
