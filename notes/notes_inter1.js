@@ -229,3 +229,80 @@ HTML5 对xss的影响主要体现在:
 通过推广暴露自己的链接，增加信任度。链接分为外向链接和内向（反向）链接，外向链接就是从本站点到其他站点，内向链接就是从其他站点到我的站点，可以尝试使用反向链接生成器。或者通过写软文、发布分类信息、发布博客文章来推广自己的网站。
 锚文本 ：把关键词做一个链接，指向别的网页，这种形式的链接就叫作锚文本。搜索引擎可以根据指向某一个网页的链接的锚文本描述来判断该网页的内容属性。
 
+关于 macrotask 和 microtask
+
+一个事件循环(EventLoop)中会有一个正在执行的任务(Task)，而这个任务就是从 macrotask 队列中来的。在whatwg规范中有 queue 就是任务队列。当这个 macrotask 执行结束后所有可用的 microtask 将会在同一个事件循环中执行，当这些 microtask 执行结束后还能继续添加 microtask 一直到真个 microtask 队列执行结束。
+
+怎么用
+
+基本来说，当我们想以同步的方式来处理异步任务时候就用 microtask（比如我们需要直接在某段代码后就去执行某个任务，就像Promise一样）。
+
+其他情况就直接用 macrotask。
+
+两者的具体实现
+
+macrotasks: setTimeout setInterval setImmediate I/O UI渲染
+microtasks: Promise process.nextTick Object.observe MutationObserver
+从规范中理解
+
+whatwg规范：https://html.spec.whatwg.org/multipage/webappapis.html#task-queue
+
+一个事件循环(event loop)会有一个或多个任务队列(task queue) task queue 就是 macrotask queue
+每一个 event loop 都有一个 microtask queue
+task queue == macrotask queue != microtask queue
+一个任务 task 可以放入 macrotask queue 也可以放入 microtask queue 中
+当一个 task 被放入队列 queue(macro或micro) 那这个 task 就可以被立即执行了
+再来回顾下事件循环如何执行一个任务的流程
+
+当执行栈(call stack)为空的时候，开始依次执行：
+
+把最早的任务(task A)放入任务队列
+如果 task A 为null (那任务队列就是空)，直接跳到第6步
+将 currently running task 设置为 task A
+执行 task A (也就是执行回调函数)
+将 currently running task 设置为 null 并移出 task A
+执行 microtask 队列
+a: 在 microtask 中选出最早的任务 task X
+b: 如果 task X 为null (那 microtask 队列就是空)，直接跳到 g
+c: 将 currently running task 设置为 task X
+d: 执行 task X
+e: 将 currently running task 设置为 null 并移出 task X
+f: 在 microtask 中选出最早的任务 , 跳到 b
+g: 结束 microtask 队列
+跳到第一步
+上面就算是一个简单的 event-loop 执行模型
+
+再简单点可以总结为：
+
+在 macrotask 队列中执行最早的那个 task ，然后移出
+执行 microtask 队列中所有可用的任务，然后移出
+下一个循环，执行下一个 macrotask 中的任务 (再跳到第2步)
+其他
+
+当一个task(在 macrotask 队列中)正处于执行状态，也可能会有新的事件被注册，那就会有新的 task 被创建。比如下面两个
+promiseA.then() 的回调就是一个 task
+promiseA 是 resolved或rejected: 那这个 task 就会放入当前事件循环回合的 microtask queue
+promiseA 是 pending: 这个 task 就会放入 事件循环的未来的某个(可能下一个)回合的 microtask queue 中
+setTimeout 的回调也是个 task ，它会被放入 macrotask queue 即使是 0ms 的情况
+microtask queue 中的 task 会在事件循环的当前回合中执行，因此 macrotask queue 中的 task 就只能等到事件循环的下一个回合中执行了
+click ajax setTimeout 的回调是都是 task, 同时，包裹在一个 script 标签中的js代码也是一个 task 确切说是 macrotask。
+
+所说的, ‘每个 Macro Task 结束后, 都要清空所有的 Micro Task‘. 引擎会遍历 Macro Task Queue, 对于每个 Macrotask 执行完毕后都要遍历执行 Tick Task Queue 的所有任务, 紧接着再遍历 Micro Task Queue 的所有任务. (这也解释了为什么 nextTick 会优于 Promise 执行)
+
+
+setTimeout(function () {
+    console.log(5);
+    }, 0);
+setImmediate(function() {
+    console.log(6);
+    });
+new Promise(function (resolve) {
+    console.log(1);
+    resolve();
+    console.log(2);
+    }).then(function () {
+    console.log(4);
+    });
+process.nextTick(function() {
+    console.log(3);
+    });
