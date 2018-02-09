@@ -48,6 +48,35 @@ float不影响页面元素,但是inline元素会被浮云元素影响(压缩)
 
 overflow: hidden或者auto会清除浮动
 
+居中
+div {
+  background:red;
+  position:absolute;
+  color:#fff;
+  top:50%;
+  left:50%;
+  padding:15px;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+padding
+flex
+text-align:center, margin: auto
+display:table-cell, text-align: center, vertical-align: middle
+
+媒体查询
+@media (max-width: 600px) {
+  .facet_sidebar {
+    display: none;
+  }
+}
+
+@media screen and (device-aspect-ratio: 16/9), screen and (device-aspect-ratio: 16/10) { ... }
+
+<link rel="stylesheet" media="screen and (max-device-width: 799px)" />
+
+
 
 
 

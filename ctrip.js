@@ -129,32 +129,7 @@ b = a.a
 https://github.com/maicki/why-did-you-update
 why did you updtate
 徐丛栎提出按功能来划分目录结构，这样就不用一个组件找component和container难找了
-图片优化
-Image optimization: Choose the right format, compress carefully and prioritize critical images over those that can be lazy-loaded.
-Common image optimizations include compression, responsively serving them down based on screen size using <picture>/<img srcset>, and resizing them to reduce image decode costs.
-工具测试
-Lighthouse audits for performance best practices. It includes audits for image optimisation and can make suggestions for images that could be compressed further or point out images that are off-screen and could be lazy-loaded.
-npm install -g lighthouse
-# or use yarn:# yarn global add lighthouse
-You may also be familiar of other performance auditing tools like PageSpeed Insights or Website Speed Test by Cloudinary which includes a detailed image analysis audit.
-Baseline JPEGs load images from top to bottom. PJPEGs load from low-resolution (blurry) to high-resolution. Pat Meenan wrote an interactive tool to test out and learn about Progressive JPEG scans too.
 
-
-The advantages of Progressive JPEGsThe ability for PJPEGs to offer low-resolution ‘previews’ of an image as it loads improves perceived performance – users can feel like the image is loading faster compared to adaptive images.
-
-On slower 3G connections, this allows users to see (roughly) what’s in an image when only part of the file has been received and make a call on whether to wait for it to fully load. This can be more pleasant than the top-to-bottom display of images offered by baseline JPEGs.
-Note: Why do PJPEGs compress better? Baseline JPEG blocks are encoded one at a time. With PJPEGs, similar Discrete Cosine Transform coefficients across more than one block can be encoded together leading to better compression.
-How do you create Progressive JPEGs?Tools and libraries like ImageMagick, libjpeg, jpegtran, jpeg-recompressand imagemin support exporting Progressive JPEGs. If you have an existing image optimization pipeline, there’s a good likelihood that adding progressive loading support could be straight-forward:
-const gulp = require('gulp');
-const imagemin = require('gulp-imagemin');
-
-gulp.task('images', function () {
-    return gulp.src('images/*.jpg')
-        .pipe(imagemin({
-            progressive: true
-        }))
-        .pipe(gulp.dest('dist'));       
-});
 本人自入职以来在深圳携程国际Online机票研发部工作已有8个月，在领导和小组同事们的帮助下，从刚入职不了解敏捷开发的小白至今对整个Online小组的敏捷开发工作流程已非常熟悉，也学到很多非专业以外的知识。作为一名前端开发人员，对前端技术栈，前端工程化有较多的学习，且对工程师原则有深刻的认识，如何在践中快速定位并解决问题有较好的理解，能够较好的完成任务。
         作为国际Online前端开发小组的一员，通过前期的学习和实践与产品积极沟通并完成每个sprint分配的任务，了解机票业务逻辑，熟练掌握开发中用到的各种工具如fiddler,grunt,webpack等，发布值班在遇到生产事件的时候能够迅速定位并很好的解决问题。后期引入前端框架React整个生态系统，努力提高代码质量，参与频道首页改版，列表页改版的工作。
         积极参加学习培训，努力学习，不断提高自己的能力。前端近两年更新很快，平时积极关注前端的最新动态，对于能引入到工作中的技术通过分析后也能大胆引入 ，敢于尝试新东西。同时也在小组内分享自己的收获, 如React的分享。
