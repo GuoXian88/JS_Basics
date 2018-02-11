@@ -39,7 +39,12 @@ position: relative元素还占据原来的空间,相对自己在文档流中的�
 position: absolute元素位置与文档流无关，不占据空间。其他元素的布局相当于
 绝对定位元素不存在一样
 绝对定位元素的位置相对于离它最近已经定位的祖先来定位，层叠可用z-index来控制显示
-position:fixed是绝对定位的一种,相对于viewport定位
+position:fixed是绝对定位的一种,相对于viewport定位,而不是父级元素
+fixed  不使用 top left right 之类的定位的时候
+margin又是根据父级来定位的
+蒙层这种也可以把div放到body的子级
+
+
 
 float的div移动直到碰到了包含它的div或者是另外一个float的div边缘
 float脱离文档流

@@ -344,7 +344,7 @@ process.nextTick(function() {
 
 //超过存储范围的两个数相加(string)
 
-//js私有变量，私有方法，继承
+//js私有变量，私有方法，继承. prototype的缺点?
 
 //let fragment = document.createDocumentFragment();在ul下动态加1000个li
 //dom更新会重排和重绘，给出只重绘不重排的例子，哪个一定会导致哪个，什么会导致重排
