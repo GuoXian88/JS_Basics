@@ -243,4 +243,273 @@ function findPattern(files, regex) {
 
 
 //js 初始化数组 new Array(arrlen).fill(0)
+/*callbacks should be used when a result must be returned in
+an asynchronous way; events should instead be used when there is a need to
+communicate that something has just happened.
 
+Another case where the EventEmitter might be preferable is when the same event
+can occur multiple times, or not occur at all. A callback, in fact, is expected to be invoked exactly once, whether the operation is successful or not.
+
+Pattern: create a function that accepts a callback and returns an
+EventEmitter, thus providing a simple and clear entry point for
+the main functionality, while emitting more fine-grained events
+using the EventEmitter.
+Closures
+and in-place definition of anonymous functions allow a smooth programming
+experience that doesn't require the developer to jump to other points in the code
+base.但是缺点就是没有模块化，复用性，可维护性会降低
+Also, we have to keep in mind that closures come at a small price in terms of
+performances and memory consumption. In addition, they can create memory
+leaks that are not so easy to identify because we shouldn't forget that any context
+referenced by an active closure is retained from garbage collection.
+减少不必要的else嵌套
+用意义明确的小函数重构
+
+
+*/
+
+function saveFile(filename, contents, callback) {
+    mkdirp(path.dirname(filename), function(err){
+        err && callback(err)
+        fs.writeFile(filename, contents, callback)
+    })
+}
+
+//async! when finished invoke next task
+function spider(url, nesting, callback) {
+    var filename = utilities.urlToFilename(url)
+    fs.readFile(filename, 'utf8', function(err, body){
+        if(err) {
+            if(err.code !== 'ENOENT') {
+                return callback(err)
+            }
+
+            return download(url, filename, function(err, body) {
+                if(err) {
+                    return callback(err)
+                }
+                spiderLinks(url, body, nesting, callback)
+            })
+        }
+        spiderLinks(url, body, nesting, callback)
+    })
+}
+
+
+function spiderLinks(currentUrl, body, nesting, callback) {
+    if(nesting === 0) {
+        return process.nextTick(callback)
+    }
+    //get all links
+    var links = utilities.getPageLinks(currentUrl, body)
+    function iterate(index) {
+        if(index === links.length) {
+            return callback()
+        }
+
+        spider(links[index], nesting - 1, function(err){
+            if(err) {
+                return callback(err)
+            }
+            iterate(index + 1)
+        })
+        iterate(0)
+    }
+}
+
+
+//缺点 stack size可能溢出
+
+/*Pattern (sequential iterator): execute a list of tasks in sequence
+by creating a function named iterator, which invokes the next
+available task in the collection and makes sure to invoke the next
+step of the iteration when the current task completes.
+In fact, the word parallel is used improperly in
+this case, as it does not mean that the tasks run simultaneously, but rather that their
+execution is carried out by an underlying nonblocking API and interleaved by the
+event loop.
+
+Promise.all
+用一个done来表示所有完成
+*/
+
+function spiderLinks(currentUrl, body, nesting, callback) {
+    if(nesting == 0) {
+        return process.nextTick(callback)
+    }
+
+    var links = utilities.getPageLinks(currentUrl, body)
+    if(links.length == 0) {
+        return process.nextTick(callback)
+    }
+
+    var completed = 0, errored = false
+
+    function done(err) {
+        if(err) {
+            errored = true
+            return callback(err)
+        }
+
+        if(++completed == links.length && !errored) {
+            return callback()
+        }
+    }
+
+    links.forEach(function(link){
+        spider(link, nesting - 1, done)
+    })
+}
+
+
+//queue
+
+function TaskQueue(concurrency) {
+    this.concurrency = concurrency
+    this.running = 0
+    this.queue = []
+}
+
+TaskQueue.prototype.pushTask = function(task, callback) {
+    this.queue.push(task)
+    this.next()
+}
+
+TaskQueue.prototype.next = function() {
+    var self = this
+    while(self.running < self.concurrency && self.queue.length) {
+        var task = self.queue.shift()
+        task(function(err){
+            self.running--
+            self.next()
+        })
+        self.running++
+    }
+}
+
+var TaskQueue = require('./taskQueue')
+var downloadQueue = new TaskQueue(2)
+
+function spiderLinks(currentUrl, body, nesting, callback) {
+    if(nesting == 0) {
+        return process.nextTick(callback)
+    }
+
+    var links = utilities.getPageLinks(currentUrl, body)
+    if(links.length == 0) {
+        return process.nextTick(callback)
+    }
+
+    var completed = 0, errored = false
+
+
+    links.forEach(function(link){
+        downloadQueue.pushTask(function(done){
+            spider(link, nesting - 1, function(err) {
+                if(err) {
+                    errored = true
+                    return callback(err)
+                }
+                if(++completed == links.length && !errored) {
+                    callback()
+                }
+                done() // queue continue next
+            })
+        })
+        
+    })
+}
+
+/*Promise
+Now comes the best part. If an exception is thrown (using the throw statement) from
+the onFulfilled() or onRejected() handler, the promise returned by the then()
+method will automatically reject with the exception as the rejection reason. This is
+a tremendous advantage over CPS, as it means that with promises, exceptions will
+propagate automatically across the chain, and that the throw statement is not an
+enemy anymore.
+
+generator:The callback passed to
+each asynchronous function will in turn resume the generator as soon as the
+asynchronous operation is complete.
+*/
+
+function asyncFlow (generatorFn) {
+    function callback(err) {
+        if(err) {
+            return generator.throw(err)
+        }
+        var results = [].slice.call(arguments, 1) // remove error
+        generator.next(results.length > 1 ? results : results[0])
+    }
+
+    var generator = generatorFn(callback)
+    generator.next()
+}
+
+//clone.js
+var fs = require('fs')
+var path = require('path')
+asyncFlow(function *(callback) {
+    var fileName = path.basename(__filename)
+    var myself = yield fs.readFile(fileName, 'utf8', callback)
+    yield fs.writeFile('clone_of_' + fileName, myself, callback)
+    console.log('Clone created')
+})
+
+/*A thunk used in generator-based control flow is just a function that
+partially applies all the arguments of the original function except
+its callback. The return value is another function that accepts only
+the callback as an argument.
+
+*/
+
+function readFileThunk(filename, options) {
+    return function(callback) {
+        fs.readFile(filename, options, callback)
+    }
+}
+
+//task queue
+function TaskQueue(concurrency) {
+    this.concurrency = concurrency
+    this.running = 0
+    this.taskQueue = []
+    this.consumerQueue = []
+    this.spawnWorkers(concurrency)
+
+}
+
+TaskQueue.prototype.spawnWorkers = function(concurrency) {
+    var self = this
+    for(var i = 0; i < concurrency; i++) {
+        co(function *() {
+            while(true) {
+                var task = yield self.nextTask()
+                yield task
+            }
+        })()
+    }
+}
+
+
+TaskQueue.prototype.pushTask = function(task) {
+    if(this.consumerQueue.length !== 0) {
+        this.consumerQueue.shift()(null, task)
+    } else {
+        this.taskQueue.push(task)
+    }
+}
+
+TaskQueue.prototype.nextTask = function() {
+    var self = this
+    return function(callback) {
+        if(self.taskQueue.length !== 0) {
+            callback(null, self.taskQueue.shift())
+        } else {
+            self.consumerQueue.push(callback)
+        }
+    }
+}
+
+var TaskQueue = require('./taskQueue')
+var downloadQueue = new TaskQueue(2)
