@@ -44,3 +44,8 @@ js; the only constraint is that the order in which the chunks arrive in each sta
 be preserved (and Node.js streams take care of this for us).
 Each stream class is also an instance of EventEmitter.
 
+Binary mode
+Object mode
+
+These two operating modes allow us to use streams not only for I/O, but also as a tool to elegantly compose processing units in a functional fashion
+
