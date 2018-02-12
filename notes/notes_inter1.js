@@ -341,6 +341,7 @@ process.nextTick(function() {
 //csrf原理及防范
 
 //ctrip.com域名及子域名是否为携程
+location.host.test(/ctrip\.com/gi)
 
 //超过存储范围的两个数相加(string)
 
