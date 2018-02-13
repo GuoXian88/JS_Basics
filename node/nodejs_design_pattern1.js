@@ -49,3 +49,173 @@ Object mode
 
 These two operating modes allow us to use streams not only for I/O, but also as a tool to elegantly compose processing units in a functional fashion
 
+readStdin.js
+*/
+//non-flowing
+process.stdin
+    .on('readable', function() {
+        var chunk
+        console.log('New data available')
+        while((chunk = process.stdin.read()) !== null) {
+            console.log('Chunk read: (' + chunk.length + ') "' + chunk.toString() + '"')
+        }
+    })
+    .on('end', function() {
+        process.stdout.write('End of stream')
+    })
+
+//flowing
+process.stdin
+    .on('data', function(chunk) {
+        console.log('New data available')
+
+        console.log('Chunk read: (' + chunk.length + ') "' + chunk.toString() + '"')
+        
+    })
+    .on('end', function() {
+        process.stdout.write('End of stream')
+    })
+
+
+var stream = require('stream')
+var chance = require('chance').Chance
+
+
+function RandomStream(options) {
+    stream.Readable.call(this, options)
+}
+
+util.inherits(RandomStream, stream.Readable)
+
+RandomStream.prototype._read = function(size) {
+    var chunk = chance.string()
+    console.log('Pushing chunk of size: ' + chunk.length)
+    this.push(chunk, 'utf8')
+    if(chance.bool({likelihood:5})) {
+        this.push(null)
+    }
+}
+
+module.exports = RandomStream
+
+
+
+//transform streams
+
+//replaceStream.js
+
+function ReplaceStream(searchString, replaceString) {
+    //receive strings instead of buffers
+    stream.Transform.call(this, { decodeStrings: false })
+    this.searchString = searchString
+    this.replaceString = replaceString
+    this.tailPiece = ''
+}
+
+util.inherits(ReplaceStream, stream.Transform)
+
+ReplaceStream.prototype._transform = function(chunk, encoding, callback) {
+    var pieces = (this.tailPiece + chunk).split(this.searchString)
+    var lastPiece = pieces[pieces.length - 1]
+    var tailLen = this.searchString.length - 1
+    this.tailPiece = lastPiece.slice(-tailLen)
+    pieces[pieces.length - 1] = lastPiece.slice(0, -tailLen)
+    this.push(pieces.join(this.replaceString))
+    callback()
+}
+
+ReplaceStream.prototype._flush = function() {
+    this.push(this.tailPiece)
+    callback()
+}
+
+module.exports = ReplaceStream
+
+
+//vscode选中所有： C-F Alt-Enter
+/*control flow patterns
+Pattern: Use a stream, or combination of streams, to easily iterate
+over a set of asynchronous tasks in sequence.
+
+Factory: a generic interface for creating objects
+解耦：把创建对象和具体实现对象分开, information hiding(加强封装)
+
+*/
+
+function createImage(name) {
+    //添加switch case 条件生成实例如果有必要的话
+    //也可以防止创建对象的class被扩展
+    return new Image(name)
+}
+
+
+function createPerson(name) {
+    var privateProps = {}
+    var person = {
+        //public interface to access private members
+        setName: function(name) {
+            //如果name只是person对象的一个属性的话，是不能这么加强的(确保name一定不为空)
+            if(!name) throw new Error('A person must have a name')
+            privateProps.name = name
+        },
+        getName: function() {
+            return privateProps.name
+        }
+    }
+    person.setName(name)
+    return person
+}
+
+
+function Container(param) {
+    //private member可通过private method来访问
+    //不能通过public method
+    function dec() {
+        if (secret > 0) {
+            secret -= 1;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    this.member = param;
+    var secret = 3;
+    var that = this;
+    //特权方法也能访问private member
+    this.service = function () {
+        return dec() ? that.member : null;
+    };
+}
+
+
+
+function Profiler(label) {
+    this.label = label
+    this.lastTime = null
+
+}
+
+Profiler.prototype.start = function() {
+    this.lastTime = process.hrtime()
+}
+
+Profiler.prototype.end = function() {
+    var diff = process.hrtime(this.lastTime)
+    console.log('Timer "' + this.label + '" took ' + diff[0] + ' s and'
+    + diff[1] + ' ns')
+}
+
+module.exports = function(label) {
+    if(process.env.NODE_ENV === 'development') {
+        return new Profiler(label)
+    } else if(process.env.NODE_ENV === 'production') {
+        //DUCK TYPING
+        return {
+            start: function() {},
+            end: function() {}
+        }
+    } else {
+        throw new Error('Must set NODE_ENV')
+    }
+}
