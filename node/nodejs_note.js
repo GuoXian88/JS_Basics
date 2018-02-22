@@ -191,6 +191,12 @@ Alternation with overlapping
 ([a-zA-Z]+)*, (a+)+ or (a|a?)+ are all vulnerable Regexes as a simple input like aaaaaaaaaaaaaaaaaaaaaaaa! can cause heavy computations. 
 
 3. middleware
+Express (http://expressjs.com) popularized the term middleware in the  
+Node.js world, binding it to a very specific design pattern. In express, in fact,  
+a middleware represents a set of services, typically functions, that are organized  
+in a pipeline and are responsible for processing incoming HTTP requests and  
+relative responses. 
+
 如果把一个http处理过程比作是污水处理，中间件就像是一层层的过滤网。每个中间件在http处理过程中通过改写request或（和）response的数据、状态，实现了特定的功能。
 Middleware allows you to define a stack of actions that you should flow through. Express servers themselves are a stack of middlewares.
 中间件函数可以执行以下任务：
@@ -201,3 +207,6 @@ Middleware allows you to define a stack of actions that you should flow through.
 调用堆栈中的下一个中间件函数。
 如果当前中间件函数没有结束请求/响应循环，那么它必须调用 next()，以将控制权传递给下一个中间件函数。否则，请求将保持挂起状态。
 
+
+4.debug nodejs 加上node --inspect index.js再加debugger可以
+在chrome里面调试https://nodejs.org/api/debugger.html#debugger_breakpoints

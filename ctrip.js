@@ -244,4 +244,15 @@ sed -i 's/^[ \t]*//;s/[ \t]*$//'
 
 7. shadowsocks 本地端口被占用时可以修改代理端口
 
+8.windows查看端口被占用的情况
+cmd 
+netstat -ano
+
+9.viewport
+如果没有视口元标记，移动设备将以典型的桌面设备屏幕宽度渲染页面，然后对页面进行缩放以适合移动设备屏幕。 通过设置视口，您可以控制视口的宽度和缩放比例。
+<head>
+  ...
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  ...
+</head>
 */

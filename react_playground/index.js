@@ -1,3 +1,5 @@
+import './style.css'
+
 function greeter(person) {
     return "Hello " + person;
 }
