@@ -218,8 +218,7 @@ class CFRecommendYSUtil {
             sDirect,
             cfTransfer,
             cTransfer,
-            fTransfer,
-            restFlights
+            fTransfer
         } = groupedFlights
 
         let tip = '',
@@ -393,482 +392,457 @@ class CFRecommendYSUtil {
             cfTransferTipParam.push('F')
         }
 
-        let getResultFlights = () => {
-            switch (`${resultType}${direct}`) {
+        //获取正常航班和推荐类的航班
+        // let nonRecommendFlights = List([]),
+        //     recommendYSFlights = List([]),
+        //     recommendCFlights = List([]),
+        //     recommendFFlights = list([])
 
-                //CF
-    
-                case 'SEARCH_FC|HAS_DIRECT|DIRECT_FIRST':
-                    //CF有直飞 直飞优先排序: CF直飞>YS直飞(推荐 fold)>CF中转
-                    if (noYS) {
-                        return cfDirect.concat(cfTransfer)
-                    } else {
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    }
-    
+        switch (`${resultType}${direct}`) {
+
+            //CF
+
+            case 'SEARCH_FC|HAS_DIRECT|DIRECT_FIRST':
+                //CF有直飞 直飞优先排序: CF直飞>YS直飞(推荐 fold)>CF中转
+                if (noYS) {
+                    return cfDirect.concat(cfTransfer)
+                } else {
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                }
+
+                ysDirect = this.addRecommendFlag(ysDirect)
+
+                //折叠
+                let isLast = cfTransfer.size == 0,
+                    ysDirectClassGradeTip = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
+                return setRecommendFieldValue(cfDirect, {
+                    tip: '',
+                    classGradeTip: ''
+                }).concat(this.addFoldFlag(setRecommendFieldValue(ysDirect, {
+                    tip: tip,
+                    classGradeTip: ysDirectClassGradeTip,
+                    iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
+                    isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.YS_FOLD_GATE.value, ysDirectClassGradeTip, isLast)).concat(setRecommendFieldValue(cfTransfer, {
+                    tip: '',
+                    classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
+                    iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                }))
+            case 'SEARCH_FC|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
+                //CF无直飞有中转 直飞优先排序: 无直飞提示>YS直飞(推荐)>CF中转
+                if (noYS) {
+                    return cfTransfer
+                    // return setRecommendFieldValue(cfTransfer, {
+                    //     tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
+                    //     classGradeTip: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.value,
+                    //     iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType,
+                    //     classGradeChildTip: RECOMMEND_TIPS.TRANSFER_CHILD_TIPS.value
+                    // })
+                } else {
+                    //折叠
+                    // let newYsDirect1 = this.addFoldFlag(ysDirect, RECOMMEND_TIPS.YS_FOLD_GATE.value)
                     ysDirect = this.addRecommendFlag(ysDirect)
-    
                     // if(cTransferSize > 0)
                     //     cfTransferTipParam.push('C')
                     // if(fTransferSize > 0)
                     //     cfTransferTipParam.push('F')
-    
-                    //折叠
-                    let isLast = cfTransfer.size == 0,
-                        ysDirectClassGradeTip = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
-                    return setRecommendFieldValue(cfDirect, {
-                        tip: '',
-                        classGradeTip: ''
-                    }).concat(this.addFoldFlag(setRecommendFieldValue(ysDirect, {
-                        tip: tip,
-                        classGradeTip: ysDirectClassGradeTip,
+                    let isLast1 = cfTransfer.size == 0,
+                        ysDirectClassGradeTip1 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
+                    return this.addFoldFlag(setRecommendFieldValue(ysDirect, {
+                        tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
+                        classGradeTip: ysDirectClassGradeTip1,
                         iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
                         isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, ysDirectClassGradeTip, isLast)).concat(setRecommendFieldValue(cfTransfer, {
+                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, ysDirectClassGradeTip1, isLast1).concat(setRecommendFieldValue(cfTransfer, {
+                        tip: '',
+                        classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType,
+                        classGradeChildTip: RECOMMEND_TIPS.TRANSFER_CHILD_TIPS.value
+                    }))
+                }
+
+            case 'SEARCH_FC|NORESULT|DIRECT_FIRST':
+            case 'SEARCH_FC|NORESULT|NONE_DIRECT_FIRST':
+                //CF无结果 无结果提示+YS直飞(推荐不收起)
+                if (ysDirect.size <= 0)
+                    return ysDirect
+                ysDirect = this.addRecommendFlag(ysDirect)
+                let ysDirectClassGradeTip2 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
+                return setRecommendFieldValue(ysDirect, {
+                    tip: RECOMMEND_TIPS.CF_NORESULT_TIPS.value,
+                    classGradeTip: ysDirectClassGradeTip2,
+                    iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType
+                })
+
+            case 'SEARCH_FC|HAS_DIRECT|NONE_DIRECT_FIRST':
+                //CF有直飞 非直飞优先排序: CF直飞 CF中转>提示语 YS直飞(推荐)
+                if (noYS) {
+                    return cfFlights //cfDirect.concat(cfTransfer)
+                } else {
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                }
+                ysDirect = this.addRecommendFlag(ysDirect)
+                //折叠
+                let ysDirectClassGradeTip3 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
+                return this.insertRecommendedFlights(setRecommendFieldValue(cfFlights, {
+                    tip: '',
+                    classGradeTip: ''
+                }), setRecommendFieldValue(ysDirect, {
+                    tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
+                    classGradeTip: ysDirectClassGradeTip3,
+                    iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
+                    isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.CF_DIRECTANDTRANSFER_CLASSGRADE_TIPS.value)
+            case 'SEARCH_FC|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
+                //CF无直飞有中转 非直飞优先排序: CF中转>无直飞提示语 YS直飞(推荐)
+                //折叠
+                if (noYS)
+                    return cfTransfer
+                ysDirect = this.addRecommendFlag(ysDirect)
+                // if(cTransferSize > 0)
+                //     cfTransferTipParam.push('C')
+                // if(fTransferSize > 0)
+                //     cfTransferTipParam.push('F')
+                let ysDirectClassGradeTip4 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
+                return this.insertRecommendedFlights(setRecommendFieldValue(cfTransfer, {
+                    tip: ''
+                }), setRecommendFieldValue(ysDirect, {
+                    tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
+                    classGradeTip: ysDirectClassGradeTip4,
+                    iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
+                    isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'))
+
+            //C
+
+            case 'SEARCH_C|HAS_DIRECT|DIRECT_FIRST':
+                //C有直飞 直飞优先排序: C直飞>FYS直飞(推荐提示语 fold)>CF中转
+                let fysDirect = fDirect.concat(ysDirect)
+                if (fysDirect.size <= 0 && fTransfer.size <= 0) {
+                    return cDirect.concat(cfTransfer)
+                } else {
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                }
+                fysDirect = this.addRecommendFlag(fysDirect)
+                fTransfer = this.addRecommendFlag(fTransfer)
+                //折叠
+                // if(cTransferSize > 0)
+                //     cfTransferTipParam.push('C')
+                // if(fTransferSize > 0)
+                //     cfTransferTipParam.push('F')
+                if (fDirectSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+                let fysDirectClassGradeTip = getClassGradeTip(fysDirectTipParam.join('/') + '_DIRECT'),
+                    isLast2 = cfTransfer.size == 0
+                if (fysDirect.size <= 0) {
+                    return setRecommendFieldValue(cDirect.concat(cTransfer), {
+                        tip: '',
+                        classGradeTip: ''
+                    }).concat(setRecommendFieldValue(fTransfer, {
+                        tip: tip,
+                        classGradeTip: getClassGradeTip('F_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                    }))
+                } else {
+                    return setRecommendFieldValue(cDirect, {
+                        tip: '',
+                        classGradeTip: ''
+                    }).concat(this.addFoldFlag(setRecommendFieldValue(fysDirect, {
+                        tip: tip,
+                        classGradeTip: fysDirectClassGradeTip,
+                        iconType: RECOMMEND_TIPS.FYS_DIRECT_CLASSGRADE_TIPS.iconType,
+                        isFold: fysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, fysDirectClassGradeTip, isLast2)).concat(setRecommendFieldValue(cfTransfer, {
                         tip: '',
                         classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
                         iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
                     }))
-                case 'SEARCH_FC|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
-                    //CF无直飞有中转 直飞优先排序: 无直飞提示>YS直飞(推荐)>CF中转
-                    if (noYS) {
-                        return cfTransfer
-                        // return setRecommendFieldValue(cfTransfer, {
-                        //     tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
-                        //     classGradeTip: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.value,
-                        //     iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType,
-                        //     classGradeChildTip: RECOMMEND_TIPS.TRANSFER_CHILD_TIPS.value
-                        // })
-                    } else {
-                        //折叠
-                        // let newYsDirect1 = this.addFoldFlag(ysDirect, RECOMMEND_TIPS.YS_FOLD_GATE.value)
-                        ysDirect = this.addRecommendFlag(ysDirect)
-                        // if(cTransferSize > 0)
-                        //     cfTransferTipParam.push('C')
-                        // if(fTransferSize > 0)
-                        //     cfTransferTipParam.push('F')
-                        let isLast1 = cfTransfer.size == 0,
-                            ysDirectClassGradeTip1 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
-                        return this.addFoldFlag(setRecommendFieldValue(ysDirect, {
-                            tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
-                            classGradeTip: ysDirectClassGradeTip1,
-                            iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
-                            isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), RECOMMEND_TIPS.YS_FOLD_GATE.value, ysDirectClassGradeTip1, isLast1).concat(setRecommendFieldValue(cfTransfer, {
-                            tip: '',
-                            classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType,
-                            classGradeChildTip: RECOMMEND_TIPS.TRANSFER_CHILD_TIPS.value
-                        }))
-                    }
-    
-                case 'SEARCH_FC|NORESULT|DIRECT_FIRST':
-                case 'SEARCH_FC|NORESULT|NONE_DIRECT_FIRST':
-                    //CF无结果 无结果提示+YS直飞(推荐不收起)
-                    if (ysDirect.size <= 0)
-                        return ysDirect
-                    ysDirect = this.addRecommendFlag(ysDirect)
-                    let ysDirectClassGradeTip2 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
-                    return setRecommendFieldValue(ysDirect, {
-                        tip: RECOMMEND_TIPS.CF_NORESULT_TIPS.value,
-                        classGradeTip: ysDirectClassGradeTip2,
-                        iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType
-                    })
-    
-                case 'SEARCH_FC|HAS_DIRECT|NONE_DIRECT_FIRST':
-                    //CF有直飞 非直飞优先排序: CF直飞 CF中转>提示语 YS直飞(推荐)
-                    if (noYS) {
-                        return cfFlights //cfDirect.concat(cfTransfer)
-                    } else {
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    }
-                    ysDirect = this.addRecommendFlag(ysDirect)
-                    //折叠
-                    let ysDirectClassGradeTip3 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
-                    return this.insertRecommendedFlights(setRecommendFieldValue(cfFlights, {
+                }
+
+            case 'SEARCH_C|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
+                //C无直飞有中转 直飞优先排序: 无直飞提示 F/S/Y直飞(fold)>CF中转
+                let fysDirect1 = fDirect.concat(ysDirect)
+                //折叠
+                // let newFysDirect5 = this.addFoldFlag(fysDirect1, RECOMMEND_TIPS.YS_FOLD_GATE.value)
+                if (fysDirect1.size <= 0 && fTransfer.size <= 0) {
+                    return cfTransfer
+                }
+                fysDirect1 = this.addRecommendFlag(fysDirect1)
+                fTransfer = this.addRecommendFlag(fTransfer)
+                tip = RECOMMEND_TIPS.C_NODIRECT_TIPS.value
+                // if(cTransferSize > 0)
+                //     cfTransferTipParam.push('C')
+                // if(fTransferSize > 0)
+                //     cfTransferTipParam.push('F')
+                if (fDirectSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+                let fysDirectClassGradeTip1 = getClassGradeTip(fysDirectTipParam.join('/') + '_DIRECT'),
+                    isLast3 = cfTransfer.size == 0
+                if (fysDirect1.size <= 0) {
+                    return setRecommendFieldValue(cTransfer, {
                         tip: '',
                         classGradeTip: ''
-                    }), setRecommendFieldValue(ysDirect, {
-                        tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
-                        classGradeTip: ysDirectClassGradeTip3,
-                        iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
-                        isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.CF_DIRECTANDTRANSFER_CLASSGRADE_TIPS.value)
-                case 'SEARCH_FC|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
-                    //CF无直飞有中转 非直飞优先排序: CF中转>无直飞提示语 YS直飞(推荐)
-                    //折叠
-                    if (noYS)
-                        return cfTransfer
-                    ysDirect = this.addRecommendFlag(ysDirect)
-                    // if(cTransferSize > 0)
-                    //     cfTransferTipParam.push('C')
-                    // if(fTransferSize > 0)
-                    //     cfTransferTipParam.push('F')
-                    let ysDirectClassGradeTip4 = getClassGradeTip(ysDirectTipParam.join('/') + '_DIRECT')
-                    return this.insertRecommendedFlights(setRecommendFieldValue(cfTransfer, {
-                        tip: ''
-                    }), setRecommendFieldValue(ysDirect, {
-                        tip: RECOMMEND_TIPS.CF_NODIRECT_TIPS.value,
-                        classGradeTip: ysDirectClassGradeTip4,
-                        iconType: RECOMMEND_TIPS.YS_DIRECT_CLASSGRADE_TIPS.iconType,
-                        isFold: ysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'))
-    
-                //C
-    
-                case 'SEARCH_C|HAS_DIRECT|DIRECT_FIRST':
-                    //C有直飞 直飞优先排序: C直飞>FYS直飞(推荐提示语 fold)>CF中转
-                    let fysDirect = fDirect.concat(ysDirect)
-                    if (fysDirect.size <= 0 && fTransfer.size <= 0) {
-                        return cDirect.concat(cfTransfer)
-                    } else {
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    }
-                    fysDirect = this.addRecommendFlag(fysDirect)
-                    fTransfer = this.addRecommendFlag(fTransfer)
-                    //折叠
-                    // if(cTransferSize > 0)
-                    //     cfTransferTipParam.push('C')
-                    // if(fTransferSize > 0)
-                    //     cfTransferTipParam.push('F')
-                    if (fDirectSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-                    let fysDirectClassGradeTip = getClassGradeTip(fysDirectTipParam.join('/') + '_DIRECT'),
-                        isLast2 = cfTransfer.size == 0
-                    if (fysDirect.size <= 0) {
-                        return setRecommendFieldValue(cDirect.concat(cTransfer), {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(setRecommendFieldValue(fTransfer, {
-                            tip: tip,
-                            classGradeTip: getClassGradeTip('F_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    } else {
-                        return setRecommendFieldValue(cDirect, {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(this.addFoldFlag(setRecommendFieldValue(fysDirect, {
-                            tip: tip,
-                            classGradeTip: fysDirectClassGradeTip,
-                            iconType: RECOMMEND_TIPS.FYS_DIRECT_CLASSGRADE_TIPS.iconType,
-                            isFold: fysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), RECOMMEND_TIPS.YS_FOLD_GATE.value, fysDirectClassGradeTip, isLast2)).concat(setRecommendFieldValue(cfTransfer, {
-                            tip: '',
-                            classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    }
-    
-                case 'SEARCH_C|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
-                    //C无直飞有中转 直飞优先排序: 无直飞提示 F/S/Y直飞(fold)>CF中转
-                    let fysDirect1 = fDirect.concat(ysDirect)
-                    //折叠
-                    // let newFysDirect5 = this.addFoldFlag(fysDirect1, RECOMMEND_TIPS.YS_FOLD_GATE.value)
-                    if (fysDirect1.size <= 0 && fTransfer.size <= 0) {
-                        return cfTransfer
-                    }
-                    fysDirect1 = this.addRecommendFlag(fysDirect1)
-                    fTransfer = this.addRecommendFlag(fTransfer)
-                    tip = RECOMMEND_TIPS.C_NODIRECT_TIPS.value
-                    // if(cTransferSize > 0)
-                    //     cfTransferTipParam.push('C')
-                    // if(fTransferSize > 0)
-                    //     cfTransferTipParam.push('F')
-                    if (fDirectSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-                    let fysDirectClassGradeTip1 = getClassGradeTip(fysDirectTipParam.join('/') + '_DIRECT'),
-                        isLast3 = cfTransfer.size == 0
-                    if (fysDirect1.size <= 0) {
-                        return setRecommendFieldValue(cTransfer, {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(setRecommendFieldValue(fTransfer, {
-                            tip: tip,
-                            classGradeTip: getClassGradeTip('F_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    } else
-                        return this.addFoldFlag(setRecommendFieldValue(fysDirect1, {
-                            tip: tip,
-                            classGradeTip: fysDirectClassGradeTip1,
-                            iconType: RECOMMEND_TIPS.FYS_DIRECT_CLASSGRADE_TIPS.iconType,
-                            isFold: fysDirect1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), RECOMMEND_TIPS.YS_FOLD_GATE.value, fysDirectClassGradeTip1, isLast3).concat(setRecommendFieldValue(cfTransfer, {
-                            tip: '',
-                            classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                case 'SEARCH_C|NORESULT|DIRECT_FIRST':
-                    //C无结果 无结果提示 FYS直飞(推荐不收起) F中转
-                    let ffysREcommend2D = fDirect.concat(ysDirect)
-                    ffysREcommend2D = this.addRecommendFlag(ffysREcommend2D)
-                    fTransfer = this.addRecommendFlag(fTransfer)
-                    if (fDirectSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-    
-                    let directTransferParamD = getDirectTransferParam(0, ffysREcommend2D)
-                    return this.addFoldFlag(setRecommendFieldValue(ffysREcommend2D, {
-                        tip: RECOMMEND_TIPS.C_NORESULT_TIPS.value,
-                        classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParamD.param),
-                        iconType: directTransferParamD.iconType,
-                        isFold: ffysREcommend2D.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, '', fTransferSize <= 0).concat(setRecommendFieldValue(fTransfer, {
-                        tip: ffysREcommend2D.size > 0 ? '' : RECOMMEND_TIPS.C_NORESULT_TIPS.value,
+                    }).concat(setRecommendFieldValue(fTransfer, {
+                        tip: tip,
                         classGradeTip: getClassGradeTip('F_TRANSFER'),
                         iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
                     }))
-                case 'SEARCH_C|NORESULT|NONE_DIRECT_FIRST':
-                    //C无结果 无结果提示 FYS直飞(推荐不收起)
-                    let ffysREcommend2 = fFlights.concat(ysDirect)
-                    ffysREcommend2 = this.addRecommendFlag(ffysREcommend2)
-                    if (fDirectSize > 0 || fTransferSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-                    let directTransferParam = getDirectTransferParam(fTransferSize, ffysREcommend2)
-                    return setRecommendFieldValue(ffysREcommend2, {
-                        tip: RECOMMEND_TIPS.C_NORESULT_TIPS.value,
-                        classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam.param),
-                        iconType: directTransferParam.iconType
-                    })
-    
-                case 'SEARCH_C|HAS_DIRECT|NONE_DIRECT_FIRST':
-                    //C有直飞 非直飞优先排序: C直飞 C中转>提示语 F直飞 F中转 YS直飞(推荐不收起)
-                    let ffysRecommend = fFlights.concat(ysDirect)
-                    if (ffysRecommend.size <= 0) {
-                        return cDirect.concat(cTransfer)
-                    } else
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    ffysRecommend = this.addRecommendFlag(ffysRecommend)
-                    //折叠
-                    if (fDirectSize > 0 || fTransferSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-                    let directTransferParam1 = getDirectTransferParam(fTransferSize, ffysRecommend)
-                    return this.insertRecommendedFlights(setRecommendFieldValue(cFlights, {
+                } else
+                    return this.addFoldFlag(setRecommendFieldValue(fysDirect1, {
+                        tip: tip,
+                        classGradeTip: fysDirectClassGradeTip1,
+                        iconType: RECOMMEND_TIPS.FYS_DIRECT_CLASSGRADE_TIPS.iconType,
+                        isFold: fysDirect1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, fysDirectClassGradeTip1, isLast3).concat(setRecommendFieldValue(cfTransfer, {
+                        tip: '',
+                        classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                    }))
+            case 'SEARCH_C|NORESULT|DIRECT_FIRST':
+                //C无结果 无结果提示 FYS直飞(推荐不收起) F中转
+                let ffysREcommend2D = fDirect.concat(ysDirect)
+                ffysREcommend2D = this.addRecommendFlag(ffysREcommend2D)
+                fTransfer = this.addRecommendFlag(fTransfer)
+                if (fDirectSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+
+                let directTransferParamD = getDirectTransferParam(0, ffysREcommend2D)
+                return this.addFoldFlag(setRecommendFieldValue(ffysREcommend2D, {
+                    tip: RECOMMEND_TIPS.C_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParamD.param),
+                    iconType: directTransferParamD.iconType,
+                    isFold: ffysREcommend2D.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.YS_FOLD_GATE.value, '', fTransferSize <= 0).concat(setRecommendFieldValue(fTransfer, {
+                    tip: ffysREcommend2D.size > 0 ? '' : RECOMMEND_TIPS.C_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip('F_TRANSFER'),
+                    iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                }))
+            case 'SEARCH_C|NORESULT|NONE_DIRECT_FIRST':
+                //C无结果 无结果提示 FYS直飞(推荐不收起)
+                let ffysREcommend2 = fFlights.concat(ysDirect)
+                ffysREcommend2 = this.addRecommendFlag(ffysREcommend2)
+                if (fDirectSize > 0 || fTransferSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+                let directTransferParam = getDirectTransferParam(fTransferSize, ffysREcommend2)
+                return setRecommendFieldValue(ffysREcommend2, {
+                    tip: RECOMMEND_TIPS.C_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam.param),
+                    iconType: directTransferParam.iconType
+                })
+
+            case 'SEARCH_C|HAS_DIRECT|NONE_DIRECT_FIRST':
+                //C有直飞 非直飞优先排序: C直飞 C中转>提示语 F直飞 F中转 YS直飞(推荐不收起)
+                let ffysRecommend = fFlights.concat(ysDirect)
+                if (ffysRecommend.size <= 0) {
+                    return cDirect.concat(cTransfer)
+                } else
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                ffysRecommend = this.addRecommendFlag(ffysRecommend)
+                //折叠
+                if (fDirectSize > 0 || fTransferSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+                let directTransferParam1 = getDirectTransferParam(fTransferSize, ffysRecommend)
+                return this.insertRecommendedFlights(setRecommendFieldValue(cFlights, {
+                    tip: '',
+                    classGradeTip: ''
+                }), setRecommendFieldValue(ffysRecommend, {
+                    tip: tip,
+                    classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam1.param),
+                    iconType: directTransferParam1.iconType,
+                    isFold: ffysRecommend.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), cTransferSize > 0 ? RECOMMEND_TIPS.C_DIRECT_OR_TRANSFER_CLASSGRADE_TIPS.value : RECOMMEND_TIPS.C_NONEDIRECT_CLASSGRADE_TIPS.value)
+            case 'SEARCH_C|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
+                //C无直飞有中转 非直飞优先排序: C中转>提示语 F直飞中转 YS直飞(推荐)
+                let ffysRecommend1 = fFlights.concat(ysDirect)
+                if (ffysRecommend1.size <= 0) {
+                    return cTransfer
+                } else {
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                }
+                ffysRecommend1 = this.addRecommendFlag(ffysRecommend1)
+                //折叠
+                if (fDirectSize > 0 || fTransferSize > 0)
+                    fysDirectTipParam.push('F')
+                if (yDirectSize > 0)
+                    fysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    fysDirectTipParam.push('S')
+                let directTransferParam2 = getDirectTransferParam(fTransferSize, ffysRecommend1)
+                return this.insertRecommendedFlights(setRecommendFieldValue(cTransfer, {
+                    tip: ''
+                }), setRecommendFieldValue(ffysRecommend1, {
+                    tip: tip,
+                    classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam2.param),
+                    iconType: directTransferParam2.iconType,
+                    isFold: ffysRecommend1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.C_TRANSFER_CLASSGRADE_TIPS.value)
+
+            //F
+
+            case 'SEARCH_F|HAS_DIRECT|DIRECT_FIRST':
+                //F有直飞 直飞优先排序: F直飞>CYS直飞(推荐提示语 fold)>CF中转
+                let cysDirect = cDirect.concat(ysDirect)
+                //折叠
+                if (cysDirect.size <= 0 && cTransfer.size <= 0) {
+                    return fDirect.concat(cfTransfer)
+                } else {
+                    tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
+                }
+
+                cysDirect = this.addRecommendFlag(cysDirect)
+                cTransfer = this.addRecommendFlag(cTransfer)
+
+                // if(cTransferSize > 0) {
+                //     cfTransferTipParam.push('C')
+                // }
+                // if(fTransferSize > 0)
+                //     cfTransferTipParam.push('F')
+                if (cDirectSize > 0)
+                    cysDirectTipParam.push('C')
+                if (yDirectSize > 0)
+                    cysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    cysDirectTipParam.push('S')
+                let cysDirectClassGradeTip = getClassGradeTip(cysDirectTipParam.join('/') + '_DIRECT'),
+                    isLast4 = cfTransfer.size == 0
+
+                if (cysDirect.size <= 0) {
+                    return setRecommendFieldValue(fDirect.concat(fTransfer), {
                         tip: '',
                         classGradeTip: ''
-                    }), setRecommendFieldValue(ffysRecommend, {
+                    }).concat(setRecommendFieldValue(cTransfer, {
                         tip: tip,
-                        classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam1.param),
-                        iconType: directTransferParam1.iconType,
-                        isFold: ffysRecommend.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), cTransferSize > 0 ? RECOMMEND_TIPS.C_DIRECT_OR_TRANSFER_CLASSGRADE_TIPS.value : RECOMMEND_TIPS.C_NONEDIRECT_CLASSGRADE_TIPS.value)
-                case 'SEARCH_C|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
-                    //C无直飞有中转 非直飞优先排序: C中转>提示语 F直飞中转 YS直飞(推荐)
-                    let ffysRecommend1 = fFlights.concat(ysDirect)
-                    if (ffysRecommend1.size <= 0) {
-                        return cTransfer
-                    } else {
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    }
-                    ffysRecommend1 = this.addRecommendFlag(ffysRecommend1)
-                    //折叠
-                    if (fDirectSize > 0 || fTransferSize > 0)
-                        fysDirectTipParam.push('F')
-                    if (yDirectSize > 0)
-                        fysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        fysDirectTipParam.push('S')
-                    let directTransferParam2 = getDirectTransferParam(fTransferSize, ffysRecommend1)
-                    return this.insertRecommendedFlights(setRecommendFieldValue(cTransfer, {
-                        tip: ''
-                    }), setRecommendFieldValue(ffysRecommend1, {
-                        tip: tip,
-                        classGradeTip: getClassGradeTip(fysDirectTipParam.join('/') + directTransferParam2.param),
-                        iconType: directTransferParam2.iconType,
-                        isFold: ffysRecommend1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.C_TRANSFER_CLASSGRADE_TIPS.value)
-    
-                //F
-    
-                case 'SEARCH_F|HAS_DIRECT|DIRECT_FIRST':
-                    //F有直飞 直飞优先排序: F直飞>CYS直飞(推荐提示语 fold)>CF中转
-                    let cysDirect = cDirect.concat(ysDirect)
-                    //折叠
-                    if (cysDirect.size <= 0 && cTransfer.size <= 0) {
-                        return fDirect.concat(cfTransfer)
-                    } else {
-                        tip = RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value
-                    }
-    
-                    cysDirect = this.addRecommendFlag(cysDirect)
-                    cTransfer = this.addRecommendFlag(cTransfer)
-    
-                    // if(cTransferSize > 0) {
-                    //     cfTransferTipParam.push('C')
-                    // }
-                    // if(fTransferSize > 0)
-                    //     cfTransferTipParam.push('F')
-                    if (cDirectSize > 0)
-                        cysDirectTipParam.push('C')
-                    if (yDirectSize > 0)
-                        cysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        cysDirectTipParam.push('S')
-                    let cysDirectClassGradeTip = getClassGradeTip(cysDirectTipParam.join('/') + '_DIRECT'),
-                        isLast4 = cfTransfer.size == 0
-    
-                    if (cysDirect.size <= 0) {
-                        return setRecommendFieldValue(fDirect.concat(fTransfer), {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(setRecommendFieldValue(cTransfer, {
-                            tip: tip,
-                            classGradeTip: getClassGradeTip('C_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    } else {
-                        return setRecommendFieldValue(fDirect, {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(this.addFoldFlag(setRecommendFieldValue(cysDirect, {
-                            tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
-                            classGradeTip: cysDirectClassGradeTip,
-                            iconType: RECOMMEND_TIPS.CYS_DIRECT_CLASSGRADE_TIPS.iconType,
-                            isFold: cysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), RECOMMEND_TIPS.YS_FOLD_GATE.value, cysDirectClassGradeTip, isLast4)).concat(setRecommendFieldValue(cfTransfer, {
-                            tip: '',
-                            classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    }
-                case 'SEARCH_F|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
-                    //F无直飞有中转 直飞优先排序: 无直飞提示 C/S/Y直飞(fold)>CF中转
-                    let cysDirect1 = cDirect.concat(ysDirect)
-                    if (cysDirect1.size <= 0 && cTransfer.size <= 0) {
-                        return cfTransfer
-                    }
-                    cysDirect1 = this.addRecommendFlag(cysDirect1)
-                    cTransfer = this.addRecommendFlag(cTransfer)
-                    // if(cTransferSize > 0)
-                    //     cfTransferTipParam.push('C')
-                    // if(fTransferSize > 0)
-                    //     cfTransferTipParam.push('F')
-                    if (cDirectSize > 0)
-                        cysDirectTipParam.push('C')
-                    if (yDirectSize > 0)
-                        cysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        cysDirectTipParam.push('S')
-                    if (cysDirect1.size <= 0) {
-                        return setRecommendFieldValue(fTransfer, {
-                            tip: '',
-                            classGradeTip: ''
-                        }).concat(setRecommendFieldValue(cTransfer, {
-                            tip: tip,
-                            classGradeTip: getClassGradeTip('C_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    } else {
-                        //折叠
-                        let cysDirectClassGradeTip1 = getClassGradeTip(cysDirectTipParam.join('/') + '_DIRECT'),
-                            isLast5 = cfTransfer.size == 0
-                        return this.addFoldFlag(setRecommendFieldValue(cysDirect1, {
-                            tip: RECOMMEND_TIPS.F_NODIRECT_TIPS.value,
-                            classGradeTip: cysDirectClassGradeTip1,
-                            iconType: RECOMMEND_TIPS.CYS_DIRECT_CLASSGRADE_TIPS.iconType,
-                            isFold: cysDirect1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), RECOMMEND_TIPS.YS_FOLD_GATE.value, cysDirectClassGradeTip1, isLast5).concat(setRecommendFieldValue(cfTransfer, {
-                            tip: '',
-                            classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
-                            iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
-                        }))
-                    }
-                case 'SEARCH_F|NORESULT|DIRECT_FIRST':
-                    //F无结果 无结果提示 CYS直飞(推荐不收起)
-                    let ccysGroupD = cDirect.concat(ysDirect)//.concat(cTransfer)
-    
-                    ccysGroupD = this.addRecommendFlag(ccysGroupD)
-                    cTransfer = this.addRecommendFlag(cTransfer)
-    
-                    if (cDirectSize > 0)
-                        cysDirectTipParam.push('C')
-                    if (yDirectSize > 0)
-                        cysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        cysDirectTipParam.push('S')
-    
-                    let directTransferParam3D = getDirectTransferParam(0, ccysGroupD)
-                    return this.addFoldFlag(setRecommendFieldValue(ccysGroupD, {
-                        tip: RECOMMEND_TIPS.F_NORESULT_TIPS.value,
-                        classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam3D.param),
-                        iconType: directTransferParam3D.iconType,
-                        isFold: ccysGroupD.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, '', cTransferSize <= 0).concat(setRecommendFieldValue(cTransfer, {
-                        tip: ccysGroupD.size > 0 ? '' : RECOMMEND_TIPS.F_NORESULT_TIPS.value,
                         classGradeTip: getClassGradeTip('C_TRANSFER'),
                         iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
                     }))
-                case 'SEARCH_F|NORESULT|NONE_DIRECT_FIRST':
-                    //F无结果 无结果提示 CYS直飞(推荐不收起)
-                    let ccysGroup = cFlights.concat(ysDirect)
-    
-                    ccysGroup = this.addRecommendFlag(ccysGroup)
-    
-                    if (cDirectSize > 0 || cTransferSize > 0)
-                        cysDirectTipParam.push('C')
-                    if (yDirectSize > 0)
-                        cysDirectTipParam.push('Y')
-                    if (sDirectSize > 0)
-                        cysDirectTipParam.push('S')
-                    let directTransferParam3 = getDirectTransferParam(cTransferSize, ccysGroup)
-                    return setRecommendFieldValue(ccysGroup, {
-                        tip: RECOMMEND_TIPS.F_NORESULT_TIPS.value,
-                        classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam3.param),
-                        iconType: directTransferParam3.iconType
-                    })
-    
-                case 'SEARCH_F|HAS_DIRECT|NONE_DIRECT_FIRST':
-                    //F有直飞 非直飞优先排序: F直飞 F中转>提示语 C直飞 C中转 YS直飞(推荐不收起)
-                    let ccysRecommend = cFlights.concat(ysDirect)
-                    if (ccysRecommend.size <= 0) {
-                        return fDirect.concat(fTransfer)
-                    } else {
-                        ccysRecommend = this.addRecommendFlag(ccysRecommend)
-                        //折叠
-                        if (cDirectSize > 0 || cTransferSize > 0)
-                            cysDirectTipParam.push('C')
-                        if (yDirectSize > 0)
-                            cysDirectTipParam.push('Y')
-                        if (sDirectSize > 0)
-                            cysDirectTipParam.push('S')
-                        let directTransferParam4 = getDirectTransferParam(cTransferSize, ccysRecommend)
-                        return this.insertRecommendedFlights(setRecommendFieldValue(fFlights, {
-                            tip: '',
-                            classGradeTip: ''
-                        }), setRecommendFieldValue(ccysRecommend, {
-                            tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
-                            classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam4.param),
-                            iconType: directTransferParam4.iconType,
-                            isFold: ccysRecommend.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                        }), fTransferSize > 0 ? RECOMMEND_TIPS.F_DIRECT_OR_TRANSFER_CLASSGRADE_TIPS.value : RECOMMEND_TIPS.F_DIRECT_CLASSGRADE_TIPS.value)
-                    }
-                case 'SEARCH_F|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
-                    //F无直飞有中转 非直飞优先排序: F中转>提示语 C直飞中转 YS直飞(推荐)
-                    let ccysRecommend1 = cFlights.concat(ysDirect)
-                    if (ccysRecommend1.size <= 0) {
-                        return fTransfer
-                    }
-                    ccysRecommend1 = this.addRecommendFlag(ccysRecommend1)
+                } else {
+                    return setRecommendFieldValue(fDirect, {
+                        tip: '',
+                        classGradeTip: ''
+                    }).concat(this.addFoldFlag(setRecommendFieldValue(cysDirect, {
+                        tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
+                        classGradeTip: cysDirectClassGradeTip,
+                        iconType: RECOMMEND_TIPS.CYS_DIRECT_CLASSGRADE_TIPS.iconType,
+                        isFold: cysDirect.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, cysDirectClassGradeTip, isLast4)).concat(setRecommendFieldValue(cfTransfer, {
+                        tip: '',
+                        classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                    }))
+                }
+            case 'SEARCH_F|NODIRECT_HAS_TRANSFER|DIRECT_FIRST':
+                //F无直飞有中转 直飞优先排序: 无直飞提示 C/S/Y直飞(fold)>CF中转
+                let cysDirect1 = cDirect.concat(ysDirect)
+                if (cysDirect1.size <= 0 && cTransfer.size <= 0) {
+                    return cfTransfer
+                }
+                cysDirect1 = this.addRecommendFlag(cysDirect1)
+                cTransfer = this.addRecommendFlag(cTransfer)
+                // if(cTransferSize > 0)
+                //     cfTransferTipParam.push('C')
+                // if(fTransferSize > 0)
+                //     cfTransferTipParam.push('F')
+                if (cDirectSize > 0)
+                    cysDirectTipParam.push('C')
+                if (yDirectSize > 0)
+                    cysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    cysDirectTipParam.push('S')
+                if (cysDirect1.size <= 0) {
+                    return setRecommendFieldValue(fTransfer, {
+                        tip: '',
+                        classGradeTip: ''
+                    }).concat(setRecommendFieldValue(cTransfer, {
+                        tip: tip,
+                        classGradeTip: getClassGradeTip('C_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                    }))
+                } else {
+                    //折叠
+                    let cysDirectClassGradeTip1 = getClassGradeTip(cysDirectTipParam.join('/') + '_DIRECT'),
+                        isLast5 = cfTransfer.size == 0
+                    return this.addFoldFlag(setRecommendFieldValue(cysDirect1, {
+                        tip: RECOMMEND_TIPS.F_NODIRECT_TIPS.value,
+                        classGradeTip: cysDirectClassGradeTip1,
+                        iconType: RECOMMEND_TIPS.CYS_DIRECT_CLASSGRADE_TIPS.iconType,
+                        isFold: cysDirect1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                    }), RECOMMEND_TIPS.YS_FOLD_GATE.value, cysDirectClassGradeTip1, isLast5).concat(setRecommendFieldValue(cfTransfer, {
+                        tip: '',
+                        classGradeTip: getClassGradeTip(cfTransferTipParam.join('/') + '_TRANSFER'),
+                        iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                    }))
+                }
+            case 'SEARCH_F|NORESULT|DIRECT_FIRST':
+                //F无结果 无结果提示 CYS直飞(推荐不收起)
+                let ccysGroupD = cDirect.concat(ysDirect)//.concat(cTransfer)
+
+                ccysGroupD = this.addRecommendFlag(ccysGroupD)
+                cTransfer = this.addRecommendFlag(cTransfer)
+
+                if (cDirectSize > 0)
+                    cysDirectTipParam.push('C')
+                if (yDirectSize > 0)
+                    cysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    cysDirectTipParam.push('S')
+
+                let directTransferParam3D = getDirectTransferParam(0, ccysGroupD)
+                return this.addFoldFlag(setRecommendFieldValue(ccysGroupD, {
+                    tip: RECOMMEND_TIPS.F_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam3D.param),
+                    iconType: directTransferParam3D.iconType,
+                    isFold: ccysGroupD.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.YS_FOLD_GATE.value, '', cTransferSize <= 0).concat(setRecommendFieldValue(cTransfer, {
+                    tip: ccysGroupD.size > 0 ? '' : RECOMMEND_TIPS.F_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip('C_TRANSFER'),
+                    iconType: RECOMMEND_TIPS.CF_TRANSFER_CLASSGRADE_TIPS.iconType
+                }))
+            case 'SEARCH_F|NORESULT|NONE_DIRECT_FIRST':
+                //F无结果 无结果提示 CYS直飞(推荐不收起)
+                let ccysGroup = cFlights.concat(ysDirect)
+
+                ccysGroup = this.addRecommendFlag(ccysGroup)
+
+                if (cDirectSize > 0 || cTransferSize > 0)
+                    cysDirectTipParam.push('C')
+                if (yDirectSize > 0)
+                    cysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    cysDirectTipParam.push('S')
+                let directTransferParam3 = getDirectTransferParam(cTransferSize, ccysGroup)
+                return setRecommendFieldValue(ccysGroup, {
+                    tip: RECOMMEND_TIPS.F_NORESULT_TIPS.value,
+                    classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam3.param),
+                    iconType: directTransferParam3.iconType
+                })
+
+            case 'SEARCH_F|HAS_DIRECT|NONE_DIRECT_FIRST':
+                //F有直飞 非直飞优先排序: F直飞 F中转>提示语 C直飞 C中转 YS直飞(推荐不收起)
+                let ccysRecommend = cFlights.concat(ysDirect)
+                if (ccysRecommend.size <= 0) {
+                    return fDirect.concat(fTransfer)
+                } else {
+                    ccysRecommend = this.addRecommendFlag(ccysRecommend)
                     //折叠
                     if (cDirectSize > 0 || cTransferSize > 0)
                         cysDirectTipParam.push('C')
@@ -876,43 +850,63 @@ class CFRecommendYSUtil {
                         cysDirectTipParam.push('Y')
                     if (sDirectSize > 0)
                         cysDirectTipParam.push('S')
-                    let directTransferParam5 = getDirectTransferParam(cTransferSize, ccysRecommend1)
-                    return this.insertRecommendedFlights(setRecommendFieldValue(fTransfer, {
-                        tip: ''
-                    }), setRecommendFieldValue(ccysRecommend1, {
+                    let directTransferParam4 = getDirectTransferParam(cTransferSize, ccysRecommend)
+                    return this.insertRecommendedFlights(setRecommendFieldValue(fFlights, {
+                        tip: '',
+                        classGradeTip: ''
+                    }), setRecommendFieldValue(ccysRecommend, {
                         tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
-                        classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam5.param),
-                        iconType: directTransferParam5.iconType,
-                        isFold: ccysRecommend1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
-                    }), RECOMMEND_TIPS.F_TRANSFER_CLASSGRADE_TIPS.value)
-    
-                //Y/S
-                case 'SEARCH_Y|NORESULT|DIRECT_FIRST':
-                case 'SEARCH_Y|NORESULT|NONE_DIRECT_FIRST':
-                    //Y无结果S有结果： 无结果提示语 S
-                    return setRecommendFieldValue(sDirect, {
-                        tip: RECOMMEND_TIPS.Y_NODIRECT_TIPS.value,
-                        classGradeTip: RECOMMEND_TIPS.S_DIRECT_CLASSGRADE_TIPS.value,
-                        iconType: RECOMMEND_TIPS.S_DIRECT_CLASSGRADE_TIPS.iconType
-                    })
-                case 'SEARCH_S|NORESULT|DIRECT_FIRST':
-                case 'SEARCH_S|NORESULT|NONE_DIRECT_FIRST':
-                    //S无结果Y有结果： 无结果提示语 Y
-                    return setRecommendFieldValue(sDirect, {
-                        tip: RECOMMEND_TIPS.S_NODIRECT_TIPS.value,
-                        classGradeTip: RECOMMEND_TIPS.Y_DIRECT_CLASSGRADE_TIPS.value,
-                        iconType: RECOMMEND_TIPS.Y_DIRECT_CLASSGRADE_TIPS.iconType
-                    })
-                default:
-                    return flights
-            }
+                        classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam4.param),
+                        iconType: directTransferParam4.iconType,
+                        isFold: ccysRecommend.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                    }), fTransferSize > 0 ? RECOMMEND_TIPS.F_DIRECT_OR_TRANSFER_CLASSGRADE_TIPS.value : RECOMMEND_TIPS.F_DIRECT_CLASSGRADE_TIPS.value)
+                }
+            case 'SEARCH_F|NODIRECT_HAS_TRANSFER|NONE_DIRECT_FIRST':
+                //F无直飞有中转 非直飞优先排序: F中转>提示语 C直飞中转 YS直飞(推荐)
+                let ccysRecommend1 = cFlights.concat(ysDirect)
+                if (ccysRecommend1.size <= 0) {
+                    return fTransfer
+                }
+                ccysRecommend1 = this.addRecommendFlag(ccysRecommend1)
+                //折叠
+                if (cDirectSize > 0 || cTransferSize > 0)
+                    cysDirectTipParam.push('C')
+                if (yDirectSize > 0)
+                    cysDirectTipParam.push('Y')
+                if (sDirectSize > 0)
+                    cysDirectTipParam.push('S')
+                let directTransferParam5 = getDirectTransferParam(cTransferSize, ccysRecommend1)
+                return this.insertRecommendedFlights(setRecommendFieldValue(fTransfer, {
+                    tip: ''
+                }), setRecommendFieldValue(ccysRecommend1, {
+                    tip: RECOMMEND_TIPS.MORE_CLASSGRADE_OPTIONS.value,
+                    classGradeTip: getClassGradeTip(cysDirectTipParam.join('/') + directTransferParam5.param),
+                    iconType: directTransferParam5.iconType,
+                    isFold: ccysRecommend1.size > RECOMMEND_TIPS.YS_FOLD_GATE.value
+                }), RECOMMEND_TIPS.F_TRANSFER_CLASSGRADE_TIPS.value)
+
+            //Y/S
+            case 'SEARCH_Y|NORESULT|DIRECT_FIRST':
+            case 'SEARCH_Y|NORESULT|NONE_DIRECT_FIRST':
+                //Y无结果S有结果： 无结果提示语 S
+                return setRecommendFieldValue(sDirect, {
+                    tip: RECOMMEND_TIPS.Y_NODIRECT_TIPS.value,
+                    classGradeTip: RECOMMEND_TIPS.S_DIRECT_CLASSGRADE_TIPS.value,
+                    iconType: RECOMMEND_TIPS.S_DIRECT_CLASSGRADE_TIPS.iconType
+                })
+            case 'SEARCH_S|NORESULT|DIRECT_FIRST':
+            case 'SEARCH_S|NORESULT|NONE_DIRECT_FIRST':
+                //S无结果Y有结果： 无结果提示语 Y
+                return setRecommendFieldValue(sDirect, {
+                    tip: RECOMMEND_TIPS.S_NODIRECT_TIPS.value,
+                    classGradeTip: RECOMMEND_TIPS.Y_DIRECT_CLASSGRADE_TIPS.value,
+                    iconType: RECOMMEND_TIPS.Y_DIRECT_CLASSGRADE_TIPS.iconType
+                })
+            default:
+                return flights
         }
-
-        let res = getResultFlights()
-
-        return restFlights.concat(res)
-
         
+
     }
 
     has(arr, propPath, target) {
@@ -1083,7 +1077,6 @@ class CFRecommendYSUtil {
             cfDirectAndTransfer = List([]),
             cDirectAndTransfer = List([]),
             fDirectAndTransfer = List([]),
-            restFlights = List([]),
             _this = this
 
         //过滤掉虚拟航班
@@ -1100,16 +1093,32 @@ class CFRecommendYSUtil {
         // })
         flights.forEach(flight => {
             let classGrade = _this.getClassGrade(flight),
+                dirInfoStr = _this.isDirect(flight),
+                isDirect = dirInfoStr === 'DIRECT',
+                isTransfer = dirInfoStr === 'TRANSFER',
+                isDirectAndTransfer = dirInfoStr === 'DIRECT_TRANSFER',
+                
                 isCorF = classGrade == 'CF' || classGrade == 'C' || classGrade == 'F',
                 isYorS = classGrade == 'YS' || classGrade == 'Y' || classGrade == 'S',
                 isC = classGrade == 'C',
                 isF = classGrade == 'F',
                 isY = classGrade == 'Y',
-                isS = classGrade == 'S',
-                dirInfoStr = _this.isDirect(flight),
-                isDirect = dirInfoStr === 'DIRECT',
-                isTransfer = dirInfoStr === 'TRANSFER',
-                isDirectAndTransfer = dirInfoStr === 'DIRECT_TRANSFER'
+                isS = classGrade == 'S'
+
+            //把非两舱推荐的YS航班当作正常的CF航班来分组处理(这里从数据的源头修改
+            //可以省去许多冗余的处理过程，如果此处没有修改成用户搜索的舱等会有很多麻烦的处理如：如何将这个YS插入到CF中又保持直飞和其他排序的顺序正常，既然可以当成CF来处理那就把它变成CF)
+            if(isYorS && !flight.get('isFCRecommendYS')) {
+                isYorS = false
+                switch(this.searchType) {
+                    case 'SEARCH_FC':
+                        isCorF = true
+                    case 'SEARCH_F':
+                        isF = true
+                    case 'SEARCH_C':
+                        isC = true
+                }
+            }
+                
             if (isDirect && isCorF) {
                 cfDirect = cfDirect.push(flight)
             }
@@ -1137,10 +1146,6 @@ class CFRecommendYSUtil {
             }
             if (isDirect && isS && flight.get('isFCRecommendYS')) {
                 sDirect = sDirect.push(flight)
-            }
-
-            if(isYorS && !flight.get('isFCRecommendYS')) {
-                restFlights = restFlights.push(flight)
             }
 
             if (!isDirect && isTransfer && isCorF) {
@@ -1180,8 +1185,7 @@ class CFRecommendYSUtil {
             sDirect,
             cfTransfer,
             cTransfer,
-            fTransfer,
-            restFlights
+            fTransfer
         }
     }
 
