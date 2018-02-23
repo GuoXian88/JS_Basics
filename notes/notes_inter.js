@@ -77,6 +77,16 @@ function emptyMiddleware (req, res, next) {
 // 监控js性能，报错
 // 共享组件
 // React Portal. Popover. Modal Dialog.
+/*问题是，我们写一个Dialog组件，就这么渲染的话，Dialog最终渲染产生的HTML就存在于上面JSX产生的HTML一起了，类似下面这样。
+
+<div class="foo">
+   <div> ... </div>
+   <div class="dialog">Dialog Content</div>
+</div>
+可是问题来了，对于对话框，从用户感知角度，应该是一个独立的组件，通常应该显示在屏幕的最中间，现在Dialog被包在其他组件中，要用CSS的position属性控制Dialog位置，就要求从Dialog往上一直到body没有其他postion是relative的元素干扰，这……有点难为作为通用组件的Dialog，毕竟，谁管得住所有组件不用position呢。
+
+还有一点，Dialog的样式，因为包在其他元素中，各种样式纠缠，CSS样式太容易搞成一坨浆糊了
+*/
 // 通用的逻辑封装
 window.onerror = function (msg, url, lineNo, columnNo, error) {
     var string = msg.toLowerCase();

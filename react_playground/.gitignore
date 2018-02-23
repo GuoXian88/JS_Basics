@@ -12,5 +12,16 @@ node_modules/
 /.idea
 /.awcache
 /.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+**.swp
+*.sw*
 
-/.cache
+# Runtime data
+.cache
+pids
+*.pid
+*.seed
+*.pid.lock
