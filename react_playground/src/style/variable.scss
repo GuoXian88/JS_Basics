@@ -1,0 +1,61 @@
+$white: #FFFFFF;
+$whiteDark: #F4F4F4;
+
+$blueLightM: #E8F0FB;
+$blueLight: #398EFE;
+$blue: #2577E3;
+$blueDark: #46677E;
+
+$blueGray: #91A4C3;
+
+$greenLightM: #E7F9F5;
+$greenLight: #94D8CB;
+$green: #06CF83;
+$greenM: #08C6A7;
+$greenDark: #11B79E;
+
+
+
+$orangeLightM: #FFF9EA;
+$orangeLight: #FFC093;
+$orange: #FF9913;
+$orangeDark: #FF680B;
+
+$red: #F30000;
+$redLight: #FBB2B2;
+$redDark: #E10022;
+
+$grayLightM: #EAEAEA;
+$grayLight: #CCCCCC;
+$gray: #999999;
+$grayDark: #666666;
+
+$black: #333333;
+
+
+$ffBase: 'Helvetica Neue',Tahoma,Arial,PingFangSC-Regular,'Hiragino Sans GB','Microsoft Yahei',sans-serif;
+
+%clearfix {
+	*zoom: 1;
+	&::after {
+		content:"";
+		display:table;
+		clear:both;
+	}
+}
+
+%ellipsis {
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+
+%ellipsis-block {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

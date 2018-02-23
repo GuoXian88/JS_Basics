@@ -1,0 +1,97 @@
+.cflt-city-picker{
+    position: relative;
+}
+.cflt-city-picker-selector{
+    all: initial;
+    display: block;
+    position: relative;
+    z-index: 20;
+    color: #333333;
+    line-height: 1;
+    font-size: 12px;
+    font-family: "Helvetica Neue", Tahoma, Arial, PingFangSC-Regular, "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+
+    ul, li{
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    width: 370px;
+    box-shadow: 0 4px 8px rgba(204, 204, 204, .8);
+    background-color: #ffffff;
+    padding: 15px 10px 10px;
+
+    .cflt-ico-close{
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        font-size: 20px;
+        color: #666;
+
+        &:hover{
+            color: #398efe;
+            cursor: pointer;
+        }
+    }
+    .hint{
+        color: #999;
+    }
+    .city-picker-wrapper{
+        margin-top: 10px;
+    }
+
+    .city-picker-tabs{
+        border-bottom: 2px solid #ccc;
+
+        li{
+            display: inline-block;
+            position: relative;
+            padding: 6px;
+            cursor: pointer;
+
+            &:hover{ color: #398efe; }
+
+            &.active{
+                color: #398efe;
+                font-weight: bold;
+                &:after{
+                    content: '';
+                    position: absolute;
+                    height: 2px;
+                    width: 100%;
+                    left: 0;
+                    bottom: -2px;
+                    background-color: #398efe;
+                }
+            }
+        }
+    }
+    .city-picker-body{
+        padding: 5px 0;
+
+        .cities{
+            li{
+                display: inline-block;
+                width: 82px;
+                padding: 0 5px;
+                line-height: 22px;
+
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                &:hover{
+                    cursor: pointer;
+                    color: #fff;
+                    background-color: #398efe;
+                }
+            }
+        }
+    }
+
+
+    &.hide, .hide{
+        display: none;
+    }
+}
