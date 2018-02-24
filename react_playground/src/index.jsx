@@ -6,14 +6,16 @@ import ShakeInput from './components/ShakeInput/index.jsx';
 
 import "./style/index.scss";
 
-const App = () => (
+const App = () => {
+    // debounce(testfn, 100)
+    return (
     <div>
         <h1>React Component</h1>
         <Modal />
         <CityPicker />
         <ShakeInput />
     </div>
-);
+)};
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

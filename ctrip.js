@@ -255,4 +255,16 @@ netstat -ano
   <meta name="viewport" content="width=device-width, initial-scale=1">
   ...
 </head>
+
+
+// `capture` flag is set to true so that a `stopPropagation` in the children
+// will not prevent all outside click handlers from firing - maja
+this.clickHandle = addEventListener(
+    document.body,
+    "click",
+    this.onOutsideClick,
+    { capture: true }
+)
+
+    
 */
