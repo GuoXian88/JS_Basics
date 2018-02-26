@@ -339,6 +339,12 @@ process.nextTick(function() {
 //英文文章统计频率最高的单词(注意tab，标点和换行)
 
 //csrf原理及防范
+/*攻击者盗用了你的身份，以你的名义发送恶意请求。
+服务端进行CSRF防御
+服务端的CSRF方式方法很多样，但总的思想都是一致的，就是在客户端页面增加伪随机数。
+Cookie Hashing(所有表单都包含同一个伪随机值)
+即后台发一个token给前端(私钥),前端请求带上token，后台校验
+*/
 
 //ctrip.com域名及子域名是否为携程
 location.host.test(/ctrip\.com/gi)
