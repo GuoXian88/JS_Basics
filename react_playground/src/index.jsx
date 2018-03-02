@@ -8,6 +8,11 @@ import "./style/index.scss";
 
 const App = () => {
     // debounce(testfn, 100)
+    window.onerror = function() {
+        console.log('caught by onerror')
+    }
+    try { throw new Error('ssssss') } catch(e) {}
+    
     return (
     <div>
         <h1>React Component</h1>

@@ -265,6 +265,41 @@ this.clickHandle = addEventListener(
     this.onOutsideClick,
     { capture: true }
 )
-Webpack does not have this concept baked in mainly because it is not a task runner, but a module bundler. 
-    
+Webpack does not have this concept baked in mainly because it is not a task runner, but a module bundler.
+
+搜索框两种模式的进度条要保持一至，transition动画需要对接上
+解决办法是弄两个进度条transition动画同时开始走，然后隐藏一个，但不能
+用display:none来隐藏这样动画的transition不会走,所以想到opacity的方法
+保持动画同步走,或者visibility:hidden也行
+
+const Progress = ({ visible, finished, percent }) => {
+    return finished ? <div className='loading finish' style={{ width: '100%' }} ></div> : <div className='loading' style={{ width: (percent ? 100 : 0) + '%', opacity: visible ? 1 : 0 }} ></div>
+}
+
+设计弹出的时候弹出可能挂到body那，若要使单击弹出内容不隐藏可以在
+弹出内容上加onMouseDown事件(就性能而言感觉这个更好)，或者是加OutsideClickHandle组件
+
+try-catch捕获到的错误不能传到window.onerror的回调函数里面
+利用枚举来解决switch-case的问题
+
+function logProps(InputComponent) {
+  InputComponent.prototype.componentWillReceiveProps = function(nextProps) {
+    console.log('Current props: ', this.props);
+    console.log('Next props: ', nextProps);
+  };
+  // The fact that we're returning the original input is a hint that it has
+  // been mutated.
+  return InputComponent;
+}
+
+// EnhancedComponent will log whenever props are received
+const EnhancedComponent = logProps(InputComponent);
+There are a few problems with this. One is that the input component cannot be reused separately from the enhanced component. More crucially, if you apply another HOC to EnhancedComponent that also mutates componentWillReceiveProps, the first HOC’s functionality will be overridden! This HOC also won’t work with function components, which do not have lifecycle methods.
+
+列表页的ABT是怎么分流的
+是根据VID来分流的吗
+不是。abt自己会生成一个自己的用户标示
+然后根据这个用户标示来进行分流的
+用户之前被分到A版的，下次也会是A版吗
+只要cookie没被清掉，是的。但是如果cookie被清掉了，会重新生成一个用户标示，重新判断
 */
