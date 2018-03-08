@@ -12,5 +12,22 @@ server 配置gzip压缩,gzip对文本类的有较好的压缩效果
 
 
 third-party script
+If a third-party script is slowing down your page load, you have several options to improve performance:
+
+Load the script using the async or defer attribute to avoid blocking document parsing.
+Consider self-hosting the script if the third-party server is slow.
+Consider removing the script if it doesn't add clear value to your site.
+Consider Resource Hints like <link rel=preconnect> or <link rel=dns-prefetch> to perform a DNS lookup for domains hosting third-party scripts.
+
+CSP is particularly powerful as it includes directives such as script-src that specifies what are valid, allowed sources for JavaScript. Below is an example of how this can be used in practice:
+
+
+// Given this CSP header
+
+Content-Security-Policy: script-src https://example.com/
+
+// The following third-party script will not be loaded or executed
+
+<script src="https://not-example.com/js/library.js"></script>
 
 */
