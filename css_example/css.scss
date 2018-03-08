@@ -81,7 +81,13 @@ display:table-cell, text-align: center, vertical-align: middle
 
 <link rel="stylesheet" media="screen and (max-device-width: 799px)" />
 
-
+css选择器尽量specific
+Conversely, not used just as a quick crutch to override the styling of something instead of figuring out how the CSS was structured and working by the original author.
+an ID has infinitely more specificity value! That is, no amount of classes alone can outweigh an ID.
+If the element has inline styling, that automatically1 wins (1,0,0,0 points)
+For each ID value, apply 0,1,0,0 points
+For each class value (or pseudo-class or attribute selector), apply 0,0,1,0 points
+For each element reference, apply 0,0,0,1 point
 
 
 

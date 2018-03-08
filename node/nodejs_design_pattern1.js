@@ -219,3 +219,27 @@ module.exports = function(label) {
         throw new Error('Must set NODE_ENV')
     }
 }
+
+/*设计模式
+a factory allows us to separate the object creation from its 
+implementation
+提供了更大的灵活性，其实就是外面再包了一层,如果Image重构成
+各种形式的Image,只需要改createImage里面的代码就可以了
+
+function createImage(name) {
+  if(name.match(/\.jpeg$/)) {
+    return new JpegImage(name);
+  } else if(name.match(/\.gif$/)) {
+    return new GifImage(name);
+  } else if(name.match(/\.png$/)) {
+    return new PngImage(name);
+  } else {
+    throw new Exception('Unsupported format');
+  }
+}
+
+Our factory also allows us to not expose the constructors of the objects it creates,  
+and prevents them from being extended or modified (remember the principle of 
+small surface area?). In Node.js, this can be achieved by exporting only the factory, 
+while keeping each constructor private.
+

@@ -302,4 +302,7 @@ There are a few problems with this. One is that the input component cannot be re
 然后根据这个用户标示来进行分流的
 用户之前被分到A版的，下次也会是A版吗
 只要cookie没被清掉，是的。但是如果cookie被清掉了，会重新生成一个用户标示，重新判断
+
+github:
+javascript stars:>100
 */
