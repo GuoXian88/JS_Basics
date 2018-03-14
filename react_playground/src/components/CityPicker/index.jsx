@@ -17,7 +17,7 @@ const generateTabPannels = function(nameStr, num, subnum) {
     for(let i=0; i<num; i++) {
         let subres = []
         for(let j=0; j<subnum; j++) {
-            subres.push({ key:`${i}-${j}`, value:`${nameStr}-${j+1}${i+1}`})
+            subres.push({ key:`${i}-${j}`, value:`${nameStr}${i+1}-${j+1}`})
         }
         res.push(subres)
     }
