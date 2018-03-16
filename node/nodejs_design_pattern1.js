@@ -243,3 +243,53 @@ and prevents them from being extended or modified (remember the principle of
 small surface area?). In Node.js, this can be achieved by exporting only the factory, 
 while keeping each constructor private.
 
+Proxy
+A proxy is an object that controls the access to another object called subject.  
+The proxy and the subject have an identical interface and this allows us to 
+transparently swap one for the other; in fact, the alternative name for this  
+pattern is surrogate. A proxy intercepts all or some of the operations that are  
+meant to be executed on the subject, augmenting or complementing their  
+behavior.
+Proxy和Subject有相同的interface
+•    Data validation: The proxy validates the input before forwarding it  
+to the subject
+•    Security: The proxy verifies that the client is authorized to perform the 
+operation and it passes the request to the subject only if the outcome of  
+the check is positive
+•    Caching: The proxy keeps an internal cache so that the operations are 
+executed on the subject only if the data is not yet present in the cache
+•    Lazy initialization: If the creation of the subject is expensive, the proxy  
+can delay it to when it's really necessary
+•    Logging: The proxy intercepts the method invocations and the relative 
+parameters, recoding them as they happen
+•    Remote objects: A proxy can take an object that is located remotely,  
+and make it appear local
+
+
+
+*/
+function createProxy(subject) {
+    var proto = Object.getPrototypeOf(subject);
+
+    function Proxy(subject) {
+        this.subject = subject; //subject是被代理对象
+    }
+    Proxy.prototype = Object.create(proto); // prototype link
+
+    //proxied method
+    Proxy.prototype.hello = function () {
+        return this.subject.hello() + ' world!';
+    }
+
+    //delegated method
+    Proxy.prototype.goodbye = function () {
+        return this.subject.goodbye
+            .apply(this.subject, arguments);
+    }
+
+    return new Proxy(subject);
+}
+
+
+
+

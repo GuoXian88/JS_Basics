@@ -207,6 +207,30 @@ Middleware allows you to define a stack of actions that you should flow through.
 调用堆栈中的下一个中间件函数。
 如果当前中间件函数没有结束请求/响应循环，那么它必须调用 next()，以将控制权传递给下一个中间件函数。否则，请求将保持挂起状态。
 
+ Today, in Node.js, the word middleware is used well 
+beyond the boundaries of the express framework, and indicates a particular pattern 
+whereby a set of processing units, filters, and handlers, under the form of functions are 
+connected to form an asynchronous sequence in order to perform preprocessing and 
+postprocessing of any kind of data. The main advantage of this pattern is flexibility; in 
+fact, this pattern allows us to obtain a plugin infrastructure with incredibly little effort, 
+providing an unobtrusive way for extending a system with new filters and handlers.
+
+The essential component of the pattern is the Middleware Manager, which is 
+responsible for organizing and executing the middleware functions. The most 
+important implementation details of the pattern are as follows:
+•    New middleware can be registered by invoking the use() function  
+(the name of this function is a common convention in many implementations 
+of this pattern, but we can choose any name). Usually, new middleware can 
+only be appended at the end of the pipeline, but this is not a strict rule.
+•    When new data to process is received, the registered middleware is invoked 
+in an asynchronous sequential execution flow. Each unit in the pipeline 
+receives in input the result of the execution of the previous unit.
+•    Each middleware can decide to stop further processing of the data by simply 
+not invoking its callback or by passing an error to the callback. An error 
+situation usually triggers the execution of another sequence of middleware 
+that is specifically dedicated to handling errors.
+
+
 
 4.debug nodejs 加上node --inspect index.js再加debugger可以
 在chrome里面调试https://nodejs.org/api/debugger.html#debugger_breakpoints
