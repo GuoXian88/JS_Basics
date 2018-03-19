@@ -1,5 +1,8 @@
 /*
 React, Vue, Angular
+React是偏重于JS的框架(JSX)，单向数据流,只专注于View
+Vue保留了html template
+Angular是完整的MV*
 
 React实现MVVM Observable实现
 
@@ -10,15 +13,92 @@ React 协议处理
 qs parse url
 
 ajax domain
+host port protocol
 
 es6 Set datastructure remove dunplicates
 
 标准盒模型与非标准盒模型
-
+height和width不同，标准是内容的宽高，非标准是加了padding的?
 https对称加密与非对称加密
 
 React router
+说一下前端路由实现的简要原理，以 hash 形式（也可以使用 History API 来处理）为例，当 url 的 hash 发生变化时，触发 hashchange 注册的回调，回调中去进行不同的操作，进行不同的内容的展示
+Router 在 react component componentWillMount 中使用 this.history.listen 去注册了 url 更新的回调函数。回调函数将在 url 更新时触发，回调中的 setState 起到 render 了新的 component 的作用
 
+*/
+Router.prototype.componentWillMount = function componentWillMount() {
+    // .. 省略其他
+    var createHistory = this.props.history;
+
+    this.history = _useRoutes2['default'](createHistory)({
+      routes: _RouteUtils.createRoutes(routes || children),
+      parseQueryString: parseQueryString,
+      stringifyQuery: stringifyQuery
+    });
+
+    this._unlisten = this.history.listen(function (error, state) {
+        _this.setState(state, _this.props.onUpdate);
+    });
+  };
+  //上面的 _useRoutes2 对 history 操作便是对其做一层包装，所以调用的 this.history 实际为包装以后的对象，该对象含有 _useRoutes2 中的 listen 方法，如下
+
+  function listen(listener) {
+        return history.listen(function (location) {
+            // .. 省略其他
+            match(location, function (error, redirectLocation, nextState) {
+              listener(null, nextState);
+            });
+        });
+  }
+  /*可看到，上面代码中，主要分为两部分
+  
+  使用了 history 模块的 listen 注册了一个含有 setState 的回调函数（这样就能使用 history 模块中的机制）
+  回调中的 match 方法为 react-router 所特有，match 函数根据当前 location 以及前面写的 Route 路由表匹配出对应的路由子集得到新的路由状态值 state，具体实现可见 react-router/matchRoutes ，再根据 state 得到对应的 component ，最终执行了 match 中的回调 listener(null, nextState) ，即执行了 Router 中的监听回调（setState），从而更新了展示。
+  以上，为起始注册的监听，及回调的作用。
+  
+  如何触发监听的回调函数的执行？
+  这里还得从如何更新 url 说起。一般来说，url 更新主要有两种方式：简单的 hash 更新或使用 history api 进行地址更新。在 react-router 中，其提供了 Link 组件，该组件能在 render 中使用，最终会表现为 a 标签，并将 Link 中的各个参数组合放它的 href 属性中。可以从 react-router/ Link 中看到，对该组件的点击事件进行了阻止了浏览器的默认跳转行为，而改用 history 模块的 pushState 方法去触发 url 更新。
+  */
+  Link.prototype.render = function render() {
+      // .. 省略其他
+      props.onClick = function (e) {
+        return _this.handleClick(e);
+      };
+      if (history) {
+       // .. 省略其他
+        props.href = history.createHref(to, query);
+      }
+      return _react2['default'].createElement('a', props);
+  };
+  
+  Link.prototype.handleClick = function handleClick(event) {
+      // .. 省略其他
+      event.preventDefault();
+      this.context.history.pushState(this.props.state, this.props.to, this.props.query);
+  };
+  /*对 history 模块的 pushState 方法对 url 的更新形式，同样分为两种，分别在 history/createBrowserHistory 及 history/createHashHistory 各自的 finishTransition 中，如 history/createBrowserHistory 中使用的是 window.history.replaceState(historyState, null, path); 而 history/createHashHistory 则使用 window.location.hash = url，调用哪个是根据我们一开始创建 history 的方式。
+  
+  更新 url 的显示是一部分，另一部分是根据 url 去更新展示，也就是触发前面的监听。这是在前面 finishTransition 更新 url 之后实现的，调用的是 history/createHistory 中的 updateLocation 方法，changeListeners 中为 history/createHistory 中的 listen 中所添加的，如下
+  */
+  function updateLocation(newLocation) {
+     // 示意代码
+      location = newLocation;
+      changeListeners.forEach(function (listener) {
+        listener(location);
+      });
+  }
+  function listen(listener) {
+       // 示意代码
+      changeListeners.push(listener);
+  }
+
+  /*可以将以上 react-router 的整个包装闭环总结为
+
+  回调函数：含有能够更新 react UI 的 react setState 方法。
+  注册回调：在 Router componentWillMount 中使用 history.listen 注册的回调函数，最终放在 history 模块的 回调函数数组 changeListeners 中。
+  触发回调：Link 点击触发 history 中回调函数数组 changeListeners 的执行，从而触发原来 listen 中的 setState 方法，更新了页面
+  */
+/*
 benchmark
 
 301，302 都是HTTP状态的编码，都代表着某个URL发生了转移，不同之处在于： 

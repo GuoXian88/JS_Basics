@@ -1,5 +1,5 @@
 
-//1.class static props
+//1.class static props 可以被extend,即可以通过原型链找到
 
 class A { static getname() { return 'A'}}
 
@@ -10,18 +10,15 @@ b = new B()
 B.getname() //'A'
 b.getname() // not work
 
-/* 4.fetch api
+/*2.fetch api
 
-这种功能以前是使用  XMLHttpRequest实现的。Fetch提供了一个更好的替代方法，可以很容易地被其他技术使
-用，例如 Service Workers。Fetch还提供了单个逻辑位置来定义其他HTTP相关概念，例如 CORS和HTTP的扩展。
+这种功能以前是使用XMLHttpRequest实现的
+Fetch提供了一个更好的替代方法，可以很容易地被其他技术使用，例如 Service Workers
+Fetch还提供了单个逻辑位置来定义其他HTTP相关概念，例如 CORS和HTTP的扩展。
 
-请注意，fetch 规范与 jQuery.ajax() 主要有两种方式的不同，牢记：
-
-当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP
- 响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的
-  ok 属性设置为 false ），  仅当网络故障时或请求被阻止时，才会标记为 reject。
-默认情况下, fetch 不会从服务端发送或接收任何 cookies, 如果站点依赖于用户 session，则会导致未经认证
-的请求（要发送 cookies，必须设置 credentials 选项）.
+fetch 规范与 jQuery.ajax() 主要有两种方式的不同，牢记：
+当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的ok 属性设置为 false ），  仅当网络故障时或请求被阻止时，才会标记为 reject。
+默认情况下, fetch 不会从服务端发送或接收任何 cookies, 如果站点依赖于用户 session，则会导致未经认证的请求（要发送 cookies，必须设置 credentials 选项
 返回promise,无回调地狱
 
 
@@ -29,42 +26,25 @@ GET and POST:
 GET用来请求资源，参数在url上,有限制
 GET is less secure compared to POST because data sent is part of the URL
 GET应该是幂等的,能被缓存
-Note that GET should not be used for operations that cause side-effects, such as using it
- for taking actions in web applications. One reason for this is that GET may be used
-  arbitrarily by robots or crawlers, which should not need to consider the side effects that
-   a request should cause.
+Note that GET should not be used for operations that cause side-effects, such as using it for taking actions in web applications. One reason for this is that GET
+may be used arbitrarily by robots or crawlers, which should not need to consider the side effects that a request should cause.
 
-Finally, an important consideration when using GET for AJAX requests is that some browsers - 
-IE in particular - will cache the results of a GET request. So if you, for example, poll 
-using the same GET request you will always get back the same results, even if the data you 
-are querying is being updated server-side. One way to alleviate this problem is to make the 
-URL unique for each request by appending a timestamp.
+Finally, an important consideration when using GET for AJAX requests is that some browsers - IE in particular - will cache the results of a GET request. So if you, for example,poll using the same GET request you will always get back the same results, even if the data you are querying is being updated server-side. One way to alleviate this problem is to make the URL unique for each request by appending a timestamp.
 
-Authors of services which use the HTTP protocol SHOULD NOT use GET based forms for the 
-submission of sensitive data, because this will cause this data to be encoded in the 
-Request-URI. Many existing servers, proxies, and user agents will log the request URI in
- some place where it might be visible to third parties. Servers can use POST-based form 
- submission instead
+Authors of services which use the HTTP protocol SHOULD NOT use GET based forms for the submission of sensitive data, because this will cause this data to be encoded in the Request-URI. Many existing servers, proxies, and user agents will log the request URI in some place where it might be visible to third parties. Servers can use POST-based form submission instead
 
 POST用来更新/插入资源,POST更安全，不能被缓存
-POST submits data to be processed (e.g., from an HTML form) to the identified resource. The
- data is included in the body of the request. This may result in the creation of a new 
- resource or the updates of existing resources or both.
+POST submits data to be processed (e.g., from an HTML form) to the identified resource. The data is included in the body of the request. This may result in the creation of a new resource or the updates of existing resources or both.
 */
 
-// web api service worker
-//A service worker, written in JavaScript, is like a client-side proxy and puts you in 
-//control of the cache and how to respond to resource requests.
-/*Web Worker 规范中定义了两类工作线程，分别是专用线程Dedicated Worker和共享线程 Shared Worker，其
-中，Dedicated Worker只能为一个页面所使用，而Shared Worker则可以被多个页面所共享
-主线程代码不会阻塞在这里等待worker线程去加载、执行指定的脚本文件，而是会立即向下继续执行后面代码。
+/*3.web api service worker
+A service worker, written in JavaScript, is like a client-side proxy and puts you in control of the cache and how to respond to resource requests.
+/*Web Worker 规范中定义了两类工作线程，
+分别是专用线程Dedicated Worker和共享线程 Shared Worker，其中
+Dedicated Worker只能为一个页面所使用，而Shared Worker则可以被多个页面所共享
+主线程代码不会阻塞在这里等待worker线程去加载、执行指定的脚本文件，而是会立即向下继续执行后面代码
 
-
-workers和主线程间的数据传递通过这样的消息机制进行——双方都使用postMessage()方法发送各自的消息，使用
-onmessage事件处理函数来响应消息（消息被包含在Message事件的data属性中）。这个过程中数据并不是被共享而
-是被复制。
-
-
+workers和主线程间的数据传递通过这样的消息机制进行——双方都使用postMessage()方法发送各自的消息，使用onmessage事件处理函数来响应消息（消息被包含在Message事件的data属性中）。这个过程中数据并不是被共享而是被复制
 */
 
 var worker = new Worker("task.js");
@@ -83,69 +63,67 @@ worker.onerror=function(error){
     console.log(error.filename,error.lineno,error.message);
 }
 
+/* 4.PWA
+Technologically speaking, PWAs are web apps, progressively enhanced with modern web technologies (Service Worker, Fetch networking, Cache API, Push notifications, 
+Web App Manifest) to provide a more app-like experience.
+*/
 
-//PWA
-/*
-Technologically speaking, PWAs are web apps, progressively enhanced with modern web 
-technologies (Service Worker, Fetch networking, Cache API, Push notifications, Web App 
-  Manifest) to provide a more app-like experience.
- */
-
-// nodejs koa express. middleware? 查看进程
+/* 5.nodejs koa, express. middleware? 查看进程
 function emptyMiddleware (req, res, next) {
     req.somedata = 42
     next()
 }
 
-// 监控js性能，报错
-// 共享组件
-// React Portal. Popover. Modal Dialog.
-/*问题是，我们写一个Dialog组件，就这么渲染的话，Dialog最终渲染产生的HTML就存在于上面JSX产生的HTML一
-起了，类似下面这样。
+*/
 
+/* 6.监控js性能，报错
+使用window.onerror = function() {}来搜集错误
+*/
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+  var string = msg.toLowerCase();
+  var substring = "script error";
+  if (string.indexOf(substring) > -1){
+      alert('Script Error: See Browser Console for Detail');
+  } else {
+      var message = [
+          'Message: ' + msg,
+          'URL: ' + url,
+          'Line: ' + lineNo,
+          'Column: ' + columnNo,
+          'Error object: ' + JSON.stringify(error)
+      ].join(' - ');
+
+      alert(message);
+  }
+  return false;
+};
+
+// 7.共享组件
+// React Portal. Popover. Modal Dialog.
+/*问题是，我们写一个Dialog组件，就这么渲染的话，Dialog最终渲染产生的HTML就存在于上面JSX产生的HTML一起了，类似下面这样
 <div class="foo">
    <div> ... </div>
    <div class="dialog">Dialog Content</div>
 </div>
 可是问题来了，对于对话框，从用户感知角度，应该是一个独立的组件，通常应该显示在屏幕的最中间，现在
-Dialog被包在其他组件中，要用CSS的position属性控制Dialog位置，就要求从Dialog往上一直到body没有其他
-postion是relative的元素干扰，这……有点难为作为通用组件的Dialog，毕竟，谁管得住所有组件不用position
-呢。
-
+Dialog被包在其他组件中，要用CSS的position属性控制Dialog位置，就要求从Dialog往上一直到body没有
+其他postion是relative的元素干扰，这……有点难为作为通用组件的Dialog，毕竟，谁管得住所有组件不用
+position呢。
 还有一点，Dialog的样式，因为包在其他元素中，各种样式纠缠，CSS样式太容易搞成一坨浆糊了
+
 */
-// 通用的逻辑封装
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-    var string = msg.toLowerCase();
-    var substring = "script error";
-    if (string.indexOf(substring) > -1){
-        alert('Script Error: See Browser Console for Detail');
-    } else {
-        var message = [
-            'Message: ' + msg,
-            'URL: ' + url,
-            'Line: ' + lineNo,
-            'Column: ' + columnNo,
-            'Error object: ' + JSON.stringify(error)
-        ].join(' - ');
 
-        alert(message);
-    }
+// 8.通用的逻辑封装
 
-    return false;
-};
-
-
-
-/* 2.HOC 复用逻辑
+/* HOC 复用逻辑(某个相同的pattern，如某类组件都需要监听数据的变化)
 You can imagine that in a large app, this same pattern of subscribing to DataSource and
- calling setState will occur over and over again. We want an abstraction that allows us to
-  define this logic in a single place and share them across many components. This is where
-   higher-order components excel.
+calling setState will occur over and over again. We want an abstraction that allows us to
+define this logic in a single place and share them across many components. This is where
+higher-order components excel.
 
 Note that a HOC doesn’t modify the input component, nor does it use inheritance to copy its
- behavior. Rather, a HOC composes the original component by wrapping it in a container 
- component. A HOC is a pure function with zero side-effects.
+behavior. Rather, a HOC composes the original component by wrapping it in a container 
+component. A HOC is a pure function with zero side-effects.
 
 When you apply a HOC to a component, though, the original component is wrapped with a 
 container component. That means the new component does not have any of the static methods of 
@@ -185,7 +163,7 @@ function logProps(WrappedComponent) {
     return Enhance;
   }
 
-// 3.React Portal
+// 9.React Portal
   render() {
     // React does *not* create a new div. It renders the children into `domNode`.
     // `domNode` is any valid DOM node, regardless of its location in the DOM.
@@ -197,7 +175,6 @@ function logProps(WrappedComponent) {
   /*A typical use case for portals is when a parent component has an overflow: hidden or 
   z-index style, but you need the child to visually “break out” of its container. For 
   example, dialogs, hovercards, and tooltips.
-
 */
 
 /**
@@ -219,21 +196,21 @@ new webpack.DefinePlugin({
 new webpack.optimize.UglifyJsPlugin()
 
 
-/* http 2:
-多路复用：多路复用很好地解决如何让重要资源尽快加载这个问题。同域名下或者不同域但是同时满足同一个 IP以
+/* 10. http 2:
+多路复用：多路复用很好地解决如何让重要资源尽快加载这个问题。同域名下或者不同域但是同时满足同一个IP以
 及使用同一个证书的这两个条件中的所有通信都在单个连接上完成，此连接上同时打开任意数量的双向数据流（ 
 HTTP 1.1 有连接数限制）。使用多域名加上相同的 IP 和证书部署 Web 服务有特殊的意义：让支持 HTTP/2 的
 终端只建立一个连接，用上 HTTP/2 协议带来的各种好处；而只支持 HTTP/1.1 的终端则会建立多个连接，达到同
-时更多并发请求的目的。
+时更多并发请求的目的
 HEAD 压缩：HTTP/2 将请求和响应数据分割为更小的帧，并对它们采用二进制编码（ Binary Framing ）。在 
 HTTP/1 中，HTTP 请求和响应都是由「状态行、请求 / 响应头部、消息主体」三部分组成，状态行和头部却没有
-经过任何压缩，直接以纯文本传输。
+经过任何压缩，直接以纯文本传输
 在 HTTP/2 中，每个数据流都以消息的形式发送，而消息又由一个或多个帧组成。多个帧之间可以乱序发送，因为
-根据帧首部的流标识可以重新组装。
+根据帧首部的流标识可以重新组装
 请求优先级：服务器可以根据流的优先级，控制资源分配(CPU、内存、带宽)，而在响应数据准备好之后，优先将最
-高优先级的帧发送给客户端。
+高优先级的帧发送给客户端
 服务器推送：启动Server Push，意味着服务端可以在发送页面HTML时主动推送其它资源，有自己独立的URL，可以
-被浏览器缓存；如果服务端推送的资源已经被浏览器缓存过，浏览器可以通过发送 RST_STREAM 帧来拒收。
+被浏览器缓存；如果服务端推送的资源已经被浏览器缓存过，浏览器可以通过发送 RST_STREAM 帧来拒收
 
 features:
 HTTP and TCP
@@ -286,17 +263,17 @@ HPACK
 Default size is 4K
 
 
-https:HTTP over SSL/TSL or HTTP Secure
+11. https:HTTP over SSL/TSL or HTTP Secure
 防止中间人攻击及内容劫持，加密数据,解密数据
 
 
 
 React:
 Even though React only updates the changed DOM nodes, re-rendering still takes some time. In
- many cases it’s not a problem, but if the slowdown is noticeable, you can speed all of this
-  up by overriding the lifecycle function shouldComponentUpdate, which is triggered before 
-  the re-rendering process starts. The default implementation of this function returns true, 
-  leaving React to perform the update:
+many cases it’s not a problem, but if the slowdown is noticeable, you can speed all of this
+up by overriding the lifecycle function shouldComponentUpdate, which is triggered before 
+the re-rendering process starts. The default implementation of this function returns true, 
+leaving React to perform the update:
 
 Most of the time, you can use React.PureComponent instead of writing your own 
 shouldComponentUpdate. It only does a shallow comparison, so you can’t use it if the props 
@@ -317,14 +294,13 @@ both, keeps the same underlying DOM node, and only updates the changed attribute
 When a component updates, the instance stays the same, so that state is maintained across 
 renders. React updates the props of the underlying component instance to match the new 
 element, and calls componentWillReceiveProps() and componentWillUpdate() on the underlying
- instance.
+instance.
 
 key
 In order to solve this issue, React supports a key attribute. When children have keys, React 
 uses the key to match children in the original tree with children in the subsequent tree. 
 For example, adding a key to our inefficient example above can make the tree conversion 
 efficient
-
 */
 
 //render props
