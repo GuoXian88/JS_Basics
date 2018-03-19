@@ -281,7 +281,7 @@ function createProxy(subject) {
         return this.subject.hello() + ' world!';
     }
 
-    //delegated method
+    //delegated method 截持原对象方法
     Proxy.prototype.goodbye = function () {
         return this.subject.goodbye
             .apply(this.subject, arguments);
@@ -290,6 +290,67 @@ function createProxy(subject) {
     return new Proxy(subject);
 }
 
+//使用对象字面量
+function createProxy(subject) {
+    return {
+      //proxied method
+      hello: function() {
+        return subject.hello() + ' world!';
+      },
+    
+      //delegated method
+      goodbye: function() {
+        return subject.goodbye.apply(subject, arguments);
+      }
+    };
+  }
 
+
+  //object augumentation 但是直接修改对象不太好呀
+  function createProxy(subject) {
+    var helloOrig = subject.hello;
+    subject.hello = function() {
+      return helloOrig.call(this) + ' world!';
+    }
+    
+    return subject;
+  }
+
+  /*Decorator is a structural pattern that consists of dynamically augmenting the 
+behavior of an existing object. It's different from classical inheritance, because the 
+behavior is not added to all the objects of the same class but only to the instances  
+that are explicitly decorated.
+
+Implementation-wise, it is very similar to the Proxy pattern, but instead of enhancing 
+or modifying the behavior of the existing interface of an object, it augments it with 
+new functionalities
+
+*/
+
+function decorate(component) {
+    var proto = Object.getPrototypeOf(component);
+    function Decorator(component) {
+      this.component = component;
+    }
+    Decorator.prototype = Object.create(proto);
+
+ //new method
+ Decorator.prototype.greetings = function() {
+    //...
+  };
+  
+  //delegated method
+  Decorator.prototype.hello = function() {
+    this.component.hello.apply(this.component, arguments);
+  };
+  
+  return new Decorator(component);
+}
+
+
+/*Adapter
+The Adapter pattern allows us to access the functionality of an object using  
+a different interface. As the name suggests, it adapts an object so that it can be  
+used by components expecting a different interface.
 
 

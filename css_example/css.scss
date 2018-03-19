@@ -89,8 +89,21 @@ For each ID value, apply 0,1,0,0 points
 For each class value (or pseudo-class or attribute selector), apply 0,0,1,0 points
 For each element reference, apply 0,0,0,1 point
 
+z-index:
+z-index only effects elements that have a position value other than static (the default).
+Without any z-index value, elements stack in the order that they appear in the DOM (the lowest one down at the same hierarchy level appears on top). 
+Also note that nesting plays a big role. If an element B sits on top of element A, a child element of element A can never be higher than element B.
 
 
+事实上在一个层叠上下文中一共可以有7种层叠等级，列举如下：
+
+背景和边框 —— 形成层叠上下文的元素的背景和边框。 层叠上下文中的最低等级。
+负z-index值 —— 层叠上下文内有着负z-index值的子元素。
+块级盒 —— 文档流中非行内非定位子元素。
+浮动盒 —— 非定位浮动元素。
+行内盒 —— 文档流中行内级别非定位子元素。
+z-index: 0 —— 定位元素。 这些元素形成了新的层叠上下文。
+正z-index值 —— 定位元素。 层叠上下文中的最高等级。
 */
 
 .clear:after {
