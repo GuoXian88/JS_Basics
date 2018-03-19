@@ -241,6 +241,40 @@ jsonp缺点：只能实现get一种请求。
     // 获取父窗口中变量
     alert('get js data from parent ---> ' + window.parent.user);
 </script>
+
+document.domain
+document.domain是比较常用的跨域方法。实现最简单但只能用于同一个主域下不同子域之间的跨域请求，比如 foo.com 和 img.foo.com 之间，img1.foo.com 和 img2.foo.com 之间。只要把两个页面的document.domain都指向主域就可以了，比如document.domain='foo.com';。
+设置好后父页面和子页面就可以像同一个域下两个页面之间访问了。父页面通过ifr.contentWindow就可以访问子页面的window，子页面通过parent.window或parent访问父页面的window，接下来可以进一步获取dom和js。
+
+<!-- foo.com/a.html -->
+<iframe id="ifr" src="http://img.foo.com/b.html"></iframe>
+<script>
+document.domain = 'foo.com';
+function aa(str) {
+    console.log(str);
+}
+window.onload = function () {
+    document.querySelector('#ifr').contentWindow.bb('aaa');
+}
+</script>
+<!-- img.foo.com/b.html -->
+
+
+<script>
+document.domain = 'foo.com';
+function bb(str) {
+    console.log(str);
+}
+
+parent.aa('bbb');
+</script>
+
+window.name
+只要不关闭浏览器，window.name可以在不同页面加载后依然保持。尝试在浏览器打开百度baidu.com，然后在控制台输入window.name='aaa';回车，接着在地址栏输入qq.com转到腾讯首页，打开控制台输入window.name查看它的值，可以看到输出了"aaa"。
+例如子页面bar.com/b.html向父页面foo.com/a.html传数据。
+
+
+
 三、 location.hash + iframe跨域
 
 实现原理： a欲与b跨域相互通信，通过中间页c来实现。 三个页面，不同域之间利用iframe的location.hash传

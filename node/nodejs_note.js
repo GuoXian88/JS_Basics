@@ -21,6 +21,21 @@ fe and be语言一致
 Node.js is the perfect tool for developing high-throughput server-side applications.
 npm packages
 
+You did a great job of summarizing what's awesome about Node.js. My feeling is that Node.js is especially suited for applications where you'd like to maintain a persistent connection from the browser back to the server. Using a technique known as "long-polling", you can write an application that sends updates to the user in real time. Doing long polling on many of the web's giants, like Ruby on Rails or Django, would create immense load on the server, because each active client eats up one server process. This situation amounts to a tarpit attack. When you use something like Node.js, the server has no need of maintaining separate threads for each open connection.
+
+This means you can create a browser-based chat application in Node.js that takes almost no system resources to serve a great many clients. Any time you want to do this sort of long-polling, Node.js is a great option.
+
+It's worth mentioning that Ruby and Python both have tools to do this sort of thing (eventmachine and twisted, respectively), but that Node.js does it exceptionally well, and from the ground up. JavaScript is exceptionally well situated to a callback-based concurrency model, and it excels here. Also, being able to serialize and deserialize with JSON native to both the client and the server is pretty nifty.
+
+I look forward to reading other answers here, this is a fantastic question.
+
+It's worth pointing out that Node.js is also great for situations in which you'll be reusing a lot of code across the client/server gap. The Meteor framework makes this really easy, and a lot of folks are suggesting this might be the future of web development. I can say from experience that it's a whole lot of fun to write code in Meteor, and a big part of this is spending less time thinking about how you're going to restructure your data, so the code that runs in the browser can easily manipulate it and pass it back.
+
+Here's an article on Pyramid and long-polling, which turns out to be very easy to set up with a little help from gevent: TicTacToe and Long Polling with Pyramid.
+
+
+ In general, any CPU intensive operation annuls all the throughput benefits Node offers with its event-driven, non-blocking I/O model because any incoming requests will be blocked while the thread is occupied with your number-crunching.
+
 
 2.security
 Security HTTP Headers
