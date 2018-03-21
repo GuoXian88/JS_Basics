@@ -237,8 +237,7 @@ important implementation details of the pattern are as follows:
 (the name of this function is a common convention in many implementations 
 of this pattern, but we can choose any name). Usually, new middleware can 
 only be appended at the end of the pipeline, but this is not a strict rule.
-•    When new data to process is received, the registered middleware is invoked 
-in an asynchronous sequential execution flow. Each unit in the pipeline 
+•    When new data to process is received, the registered middleware is invoked in an asynchronous sequential execution flow. Each unit in the pipeline 
 receives in input the result of the execution of the previous unit.
 •    Each middleware can decide to stop further processing of the data by simply 
 not invoking its callback or by passing an error to the callback. An error 
