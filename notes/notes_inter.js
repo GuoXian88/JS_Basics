@@ -64,8 +64,7 @@ worker.onerror=function(error){
 }
 
 /* 4.PWA
-Technologically speaking, PWAs are web apps, progressively enhanced with modern web technologies (Service Worker, Fetch networking, Cache API, Push notifications, 
-Web App Manifest) to provide a more app-like experience.
+Technologically speaking, PWAs are web apps, progressively enhanced with modern web technologies (Service Worker, Fetch networking, Cache API, Push notifications, Web App Manifest) to provide a more app-like experience.
 */
 
 /* 5.nodejs koa, express. middleware? 查看进程
