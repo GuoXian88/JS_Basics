@@ -44,5 +44,30 @@ facebook的性能优化怎么做的?
 改版进度条动画
 闭包怎么实现
 
+/^
+  (?=.*\d)          // should contain at least one digit
+  (?=.*[a-z])       // should contain at least one lower case
+  (?=.*[A-Z])       // should contain at least one upper case
+  [a-zA-Z0-9]{8,}   // should contain at least 8 from the mentioned characters
+$/
+ x?=y匹配'x'仅仅当'x'后面跟着'y'.这种叫做正向肯定查找。
+例如，/Jack(?=Sprat)/会匹配到'Jack'仅仅当它后面跟着'Sprat'。/Jack(?=Sprat|Frost)/匹配‘Jack’仅仅当它后面跟着'Sprat'或者是‘Frost’。但是‘Sprat’和‘Frost’都不是匹配结果的一部分。
 
+typeof [] //object
+
+
+
+I think there are far more important skills to learn to become a more in-demand developer:
+
+Learn everything you can about the JavaScript language itself, its bad parts and good parts, and all the modern features it recently gained. Learn how to build and use the various data structures in JavaScript.
+Learn the JavaScript runtimes like Node and Browsers and learn how they are single-threaded. Learn their APIs and limitations. Learn about the event loop. Learn about the VM’s call stacks. Get comfortable with browsers’ DevTools.
+Learn how to share code between clients and servers and preload initial data. Learn how to minimize JavaScript loading and parsing in browsers. Learn how to load JavaScript on demand.
+Learn the merits of functional programming and use its concepts where you can. Learn how to be declarative instead of imperative when you can.
+Learn about small JavaScript libraries which do one thing and do it well. Pick libraries with the smallest API and don’t focus on the APIs but rather on what these libraries enable you to do.
+Learn how to build scalable data APIs (take a look at GraphQL).
+Learn the power of CSS and how to use it to minimize your applications JavaScript code. Learn the new Flexbox and Grid layouts. Learn about UI-responsive design.
+Learn how to add static types to JavaScript with TypeScript (or Flow) and learn where you should focus on types vs testing.
+
+发展: 性能 nodejs python cpp
+current role: sicp --> python
  */
