@@ -264,7 +264,7 @@ Default size is 4K
 
 11. https:HTTP over SSL/TSL or HTTP Secure
 防止中间人攻击及内容劫持，加密数据,解密数据
-
+HTTPS 相比 HTTP 多了一层 SSL/TLS
 
 
 React:
