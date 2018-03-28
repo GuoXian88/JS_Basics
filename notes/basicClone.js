@@ -133,7 +133,7 @@ function initCloneArray(array) {
   // Add properties assigned by `RegExp#exec`.
   if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
     result.index = array.index
-    result.input = array.input
+    result.input = array.input //这个是处理正则的
   }
   return result
 }
