@@ -73,6 +73,12 @@ function emptyMiddleware (req, res, next) {
     next()
 }
 
+var exec = require('child_process').exec;
+exec('tasklist', function(err, stdout, stderr) {
+  // stdout is a string containing the output of the command.
+  // parse it and look for the apache and mysql processes.
+});
+
 */
 
 /* 6.监控js性能，报错
