@@ -64,8 +64,7 @@ worker.onerror=function(error){
 }
 
 /* 4.PWA
-Technologically speaking, PWAs are web apps, progressively enhanced with modern web technologies (Service Worker, Fetch networking, Cache API, Push notifications, 
-Web App Manifest) to provide a more app-like experience.
+Technologically speaking, PWAs are web apps, progressively enhanced with modern web technologies (Service Worker, Fetch networking, Cache API, Push notifications, Web App Manifest) to provide a more app-like experience.
 */
 
 /* 5.nodejs koa, express. middleware? 查看进程
@@ -74,6 +73,12 @@ function emptyMiddleware (req, res, next) {
     next()
 }
 
+var exec = require('child_process').exec;
+exec('tasklist', function(err, stdout, stderr) {
+  // stdout is a string containing the output of the command.
+  // parse it and look for the apache and mysql processes.
+});
+或者用ps-node lib
 */
 
 /* 6.监控js性能，报错
@@ -265,7 +270,7 @@ Default size is 4K
 
 11. https:HTTP over SSL/TSL or HTTP Secure
 防止中间人攻击及内容劫持，加密数据,解密数据
-
+HTTPS 相比 HTTP 多了一层 SSL/TLS
 
 
 React:

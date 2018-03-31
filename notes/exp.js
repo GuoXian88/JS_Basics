@@ -24,5 +24,174 @@
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 
+Write it for other humans
+Write code for a junior developer who will come to fix issues in your code 2 years from now. This means:
+
+Choose better variable and function names
+Explain why(not what) the code does what it does using inline comments
+Write better commit messages
+Have a README with installation guidelines and coding guidelines
+Treat documentation as an integral part of code base that needs constant review and refactoring
+Write your codebase as it will be managed by an idiot in future, because eventually, it may be.
+
+PS: Optimising code for machines is important too, but try to abstract that from fellow homo-sapiens.
+
+Write test cases
+The best products I’ve worked with have had test coverages between 85–95%. It clearly looks like a big commitment, specially when you’re an indie developer.
+
+It’s not possible to test everything, but at least write test cases for the parts that are likely to fail or change over time.
+
+Writing unit or integration test sometime seems like an expensive affair, but at the end of the day they are always cheaper than fixing issues making it to production.
+
+Stick with your tools
+It takes considerable work before you get comfortable with your tools (ex IDE). It takes even more work to make a tool part of your subconscious.
+
+Surprisingly large number of developers change their tools, languages, frameworks on a very frequent basis. I am not against getting the experience of working with all these tools, but I am surely against switching these on a very regular basis.
+
+It’s doesn’t have to be a marriage between you and your tools, but you shouldn’t be having too many one night stands as well. Settle down for some time, kid!
+
+Deploy it!
+I’ve lost count of projects that never saw daylight. Most developers have two amazing personality traits:
+
+Perfectionist: The part that doesn’t let you launch anything short of perfect
+Procrastinator: That doesn’t let you make anything perfect Don’t let these traits take over and stop you from launching even if you don’t have a good product. Don’t let your dream app die in a private git repo!
+Defend your best practices
+If the doctor washes his hands before doing your examination, that is considered normal (in fact, a good practice).
+
+But if a developer wants to write test cases before writing actual code, many employers/clients find it weird.
+
+Each trade have some good practices that should be followed religiously. Sometimes being a great salesman is the pathway for being a great programmer. Sell your best practices!
+
+Your client/employer may not know about the best practices in tech. It’s YOUR responsibility to educate them and, if required, even tell them what may happen if you don’t follow the best practices. (It’s ok to scare them with an historical example or two).
+
+Learn a new programming language
+Learn a new language every year. If you can use it for work, Awesome! If not, that’s ok. A new language won’t just give you an additional skill, it will also give you new ways to think.
+
+For example, coming from Java and C++ background, it took me some time to digest the fact that we can run a program in PHP without a main function.
+
+After working on PHP-Apache based urls (e.g. home.php), Python’s way of implementing routes and URIs was almost a shock for me.
+
+Learning a new language will help you question the standards in your current language.
+
+Call to action
+If you could change one thing about your programming practices, what will it be? Change that. NOW.
+
+
+1 -- Learn to split large complex goals into small, simpler ones.
+
+
+Making coffee for four people as specified is the overall goal in this example. However, you can't just "make coffee" as if it was one single action. As anybody who knows how to make coffee could tell you, you need to divide the work into separate smaller tasks. Each of them needs to be simple enough to be easy to tackle at once.
+
+Here is a list of tasks that needs to be done to make the coffee as specified by the main goal:
+
+
+
+The ability to split work into tasks is natural to humans, and a required skill to get most things done. Making the above list doesn't require any particular study or practice other than knowing how to make coffee. In other words, more or less anyone can do it.
+
+However, the difference between a practical everyday problem like making coffee and a more complex challenge like software building is that the steps to build software are rarely heavily rehearsed. To be able to list what tasks are necessary to build a particular piece of software requires having done it many times before. That is not very common in software building. That's why experienced software engineers don't jump immediately to writing a task list. Instead, they split the overall problem into more straightforward ones.
+
+Engineers refer to the problems to resolve as the "what," and as the tasks to accomplish as the "how." In the coffee making example, the list of subgoals (the what) could be crafted as follows.
+
+Subgoals:
+We have cups ready to be filled.
+We have enough ground coffee.
+The coffee maker is full of water.
+We have a filter filled with ground coffee. This subgoal requires subgoal #2 to be completed.
+The filter full of coffee is inside the coffee maker. This subgoal requires #4 to be completed.
+The coffee maker is brewing the coffee; requires #3 and #5 to be done.
+The coffee maker is done brewing; requires #6 to be done, and enough time to have passed.
+We have cups filled with coffee; requires #7 and #1 to be done.
+The cream was added to two of the cups; requires #1 to be completed.
+Sugar was added to one of the cups with the cream, and one of the cups without cream; requires #1 and #9 to be completed.
+The content of each cup is stirred and well mixed; requires #8, #9 and #10 to be completed.
+Note how these are not descriptions of tasks or actions. They are descriptions of results that need to be obtained and their dependencies.
+
+A graphical representation can be crafted to visualize the list above. Boxes represent subgoals, and incoming arrows into each box represent requirements to be satisfied for the subgoal to be achievable:
+
+
+
+In the case of coffee making it is tempting to just write a list of tasks. That works only for simple problems that you know how to resolve without much planning. However, in software building that is rarely the case.
+
+Planning subgoals allows us to abstract results from actions, and that is a critical difference. For example, subgoal #4, "we have a filter filled with ground coffee," might require going to the store to buy the filter. What matters in a subgoal is the result that needs to be achieved. The "what" is the important abstraction, while the "how" is a tactical choice that depends on the context (i.e., do you have filters or do you need to buy them?)
+
+2 -- Learn to think parallel.
+
+
+The subgoals presented above could be done one at the time, sequentially, in the order listed. However, that would not be optimal. The dependencies give us a clue on how what needs to be done in a specific order and what doesn't.
+
+For example, you can start grinding the coffee beans first, and while the electric grinder is doing its job, you can fill the coffee maker with water. That's because filling the coffee maker with water doesn't require having the ground coffee ready. Also, grinding the coffee beans only requires to start the grinder, the rest of the time we'd be waiting for the grinder to finish. If the grinder were manual and kept you busy, that'd be a different story.
+
+Moreover, while you are waiting for the coffee maker to brew, you can get the cups out of the cabinet. In fact, nothing depends on the cups to be ready until we need to start pouring ingredients into them.
+
+You can also pour the cream and the sugar in the empty cups, even before the coffee is done. Doing that has the effect of making stirring unnecessary; if you pour lots of hot coffee in cups already containing a little cream and sugar, the coffee ingredients mix naturally eliminating the need to stir. On the other hand, if you pour a little sugar or cream in a cup full of coffee, you need to stir to obtain a homogeneous mix.
+
+Reordering Tasks
+Reordering the tasks with the intent of maximizing parallel execution saves time and eliminates one of the steps. The final list of tasks, in the optimal order, is:
+
+Fill the electric grinder with coffee beans, and start it.
+While the grinder is doing its job, fill the coffee maker with water.
+When the grinder is done, put the ground coffee in the filter.
+Put the filter in the coffee maker.
+Start the coffee maker.
+While the coffee is brewing, get four cups out of the cabinet.
+Put cream in two coffee cups.
+Put sugar in one coffee cup without cream and in one with cream.
+Wait for the coffee to finish to brew.
+Pour coffee into each of the coffee cups.
+Or, represented as a sequence diagram (click on it to expand):
+
+[
+
+Note how the ordering of tasks doesn't affect the list of subgoals. It depends on it, and it's guided by it, but it doesn't change it. Tasks that are not dependent can be re-ordered in whatever way; that allows to maximize parallelism of execution.
+
+Additionally, thinking about the subgoals first can be done without having to decide how to accomplish any of them. That further splits the overall problem into smaller ones that can be tackled in isolation.
+
+3 -- Learn to abstract, but don't over-abstract.
+
+
+The goal of making coffee as specified is narrow and prescriptive. If the problem changes and you now have five people instead of 4, and somebody wants vanilla syrup in their coffee, and one person wants decaf, the list of subgoals and tasks would have to be re-designed.
+
+Programmers learn to design solutions so that they don't have to be re-designed every time that some of the parameters change. They learn to abstract problems in ways that allow a solution to resolve any class of problems similar to the original one.
+
+Abstracting Coffee Making
+In the coffee example, you might want to abstract the subgoals to account for any number N of people, instead of a fixed 4. You might also want to introduce an abstraction for things like cream and sugar. You might call it "extras." The list could change over time to include syrup, nutmeg, foam, eggnog, vodka or whatever people like to put in their coffee. Such abstraction could allow for any number X of extras that can be added in whatever amount in each of the cups.
+
+Another abstraction could be the type of coffee. Caffeinated and decaf are two obvious ones, but there could be more, like a bold roast, medium roast, light roast, Colombian, breakfast blend, etc.
+
+Since the coffee maker can only brew a type of coffee at the time, you can see how this complicates things substantially. If some of the four people in the original problem asked for caffeinated and others asked for decaf, the requirement of serving the coffee to all of them at the same time and as hot as possible would get complicated to pull off. At that point, you need to abstract away the concept of how many coffee makers you have --- up to Y if you have Y coffee varieties. Also, the parallelism of the operations, if you have Y coffee makers independently running, can become tricky. At that point, a developer might want to consider abstracting the number of baristas. If you have K baristas working together, how does the whole thing change?
+
+Abstracting Some More
+At that point, you might realize that coffee is just another ingredient of a beverage, so why make it unique? You could decide that coffee is one of the extras, and eliminate the whole specialized idea of coffee. However, coffee requires special handling and preparation, so maybe all extras should allow for generic special handling and preparation. For example, if eggnog is one of the extras, there could be a whole flow to describe the making of eggnog. But, at that point, you could abstract preparation of anything, and eggnog would merely be another product that you can create.
+
+Over-Engineering
+Does your head hurt yet? Welcome inside the twisted world of over-engineering. Do you see how quickly abstractions complicate the picture if you push them too far? We started from one type of coffee, four people to be served, a fixed configuration of extras and one barista. That was easy and natural. If you try to abstract every aspect of making coffee and if you are contemplating the possibility of having N people to serve, X types of extras, Y coffee varieties, K baristas... now that gets complicated, especially if you want to optimize cost and speed of the operation. You quickly go from making coffee to making any product under the sun using any process possible. Ouch.
+
+An idealistic software engineer will try to abstract everything and will end up with a complicated machinery that is most likely planned to be used only to make coffee for a family of four people. An experienced software engineer, however, will abstract things to be able to resolve essential use cases and might consider other possible abstractions, but only to make sure that present decisions don't block future needs.
+
+Balance
+When do you stop abstracting? That is an art that experience refines. The rule of thumb is that you should abstract only use cases that you think will be required shortly, and try not to block future abstractions with narrow decisions.
+
+4 -- Learn to Consider Re-Using Existing Solutions
+
+
+No need to re-invent the wheel.
+
+Not everything has to be re-invented from scratch. Experienced developers always consider using tools that are already available before they start designing a solution from scratch.
+
+For example, instead of making coffee, can you go out and buy it from Starbucks and bring it to your four friends? If you don't have cups, coffee, and a coffee maker, going to Starbucks is a far cheaper and faster solution, especially if you don't plan to make coffee every day for a long time.
+
+Finding and re-using solutions that are ready to go is part of the problem-solving skills a developer needs to acquire.
+
+5 -- Learn to Think in Terms of Data Flows.
+
+
+After years of practice, experienced developers start thinking of software, and problem-solving in terms of data flows through a system. In the coffee making problem, think of it as a flow of water, coffee, cups and extras from their sources all the way to the destination.
+
+Water starts from the faucet; coffee comes from a bag that you have in your pantry --- the grocery store before that --- cups from your cupboard and the extras come from different sources depending what they are.
+
+These materials (data) flow through a series of steps that manipulate, transform and mix. The initial state is the raw resources located wherever they are stored, and the final state is a series of cups filled with coffee plus extras. The destination is somebody's mouth.
+
+Thinking in terms of data flows allow to visualize the primary goal and its subgoals as a series of boxes and arrows. The boxes represent each action that affects the materials flowing in the system, and the arrows are like pipes where the materials flow through.
+
 
 

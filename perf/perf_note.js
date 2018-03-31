@@ -30,4 +30,45 @@ Content-Security-Policy: script-src https://example.com/
 
 <script src="https://not-example.com/js/library.js"></script>
 
+
+//benchmark:
+console.time('someFunction');
+
+someFunction(); // run whatever needs to be timed in between the statements
+
+console.timeEnd('someFunction');
+
+setTimeout实际时间差不多是2ms(Chrome browser)
+(Note: this means the delay in a setTimeout call is not a sure thing; it is the minimum delay before the callback is executed. The actual time taken depends on how long it takes to process any messages ahead of it in the queue.)
+So what happens if the delay is set to 0? A new message is added to the queue immediately, and will be processed when the currently executing code is finished and any previously-added messages have been processed.
+
+perf kpi:
+Load Time	First Byte	Start Render	Visually Complete	Speed Index	Result (error code)  Document Complete 
+Fully Loaded
+
+connection view:
+DNS Lookup
+Initial Connection
+SSL Negotiation
+Start Render
+DOM Content Loaded
+On Load
+Document Complete
+
+loading:
+Request Start
+DNS Lookup
+Initial Connection
+SSL Negotiation
+Time to First Byte
+Content Download
+Bytes Downloaded
+Certificates
+
+First Byte Time
+Keep-alive Enabled
+Compress Transfer
+Compress Images
+Cache static content
+Effective use of CDN
 */
