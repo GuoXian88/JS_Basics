@@ -11,7 +11,7 @@
  *
  * Date: 2018-01-20T17:24Z
  */
-( function( global, factory ) {
+( function( global, factory ) { // global是nodejs里的全局变量
 
 	"use strict";
 
@@ -45,6 +45,7 @@
 // enough that all such attempts are guarded in a try block.
 "use strict";
 
+//效率更高
 var arr = [];
 
 var document = window.document;
@@ -71,7 +72,7 @@ var ObjectFunctionString = fnToString.call( Object );
 
 var support = {};
 
-var isFunction = function isFunction( obj ) {
+var isFunction = function isFunction( obj ) { //dom 对象居然可以被当成function
 
       // Support: Chrome <=57, Firefox <=52
       // In some browsers, typeof returns "function" for HTML <object> elements
@@ -81,7 +82,7 @@ var isFunction = function isFunction( obj ) {
   };
 
 
-var isWindow = function isWindow( obj ) {
+var isWindow = function isWindow( obj ) { //如何判断是不是window window.window === window
 		return obj != null && obj === obj.window;
 	};
 
