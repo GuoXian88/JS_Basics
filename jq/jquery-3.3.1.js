@@ -351,6 +351,7 @@ jQuery.extend( {
 
 		if ( isArrayLike( obj ) ) {
 			length = obj.length;
+			// for循环效率高且可以break
 			for ( ; i < length; i++ ) {
 				if ( callback.call( obj[ i ], i, obj[ i ] ) === false ) {
 					break;
