@@ -1,4 +1,4 @@
-//closure
+//closure var是函数作用域,所以最后var i还保留着，不会销毁值都是3
 for (var i = 1; i <= 3; i++) {
     (function(index) {
         setTimeout(function() { alert(index); }, i * 1000);
