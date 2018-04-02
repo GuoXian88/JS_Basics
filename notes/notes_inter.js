@@ -20,7 +20,24 @@ fetch 规范与 jQuery.ajax() 主要有两种方式的不同，牢记：
 当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的ok 属性设置为 false ），  仅当网络故障时或请求被阻止时，才会标记为 reject。
 默认情况下, fetch 不会从服务端发送或接收任何 cookies, 如果站点依赖于用户 session，则会导致未经认证的请求（要发送 cookies，必须设置 credentials 选项
 返回promise,无回调地狱
+fetch 中的 response/request 都是 stream 对象
+因为，req/res 都是以流的形式存在的，即，req/res 的 body 只能被使用一次。相当于就是一个文件从缓存读到硬盘里面，那么原来文件就已经消失了。我们可以通过 bodyUsed 去检查，该对象是否已经被使用
+cors
+fetch('https://www.villainhr.com/cors-enabled/some.json', {mode: 'cors'})  
+  .then(function(response) {  
+    return response.text();  
+  })
 
+same-origin: 表示只请求同域. 如果你在该 mode 下进行的是跨域的请求的话, 那么就会报错.
+no-cors: 正常的网络请求, 主要应对于没有后台没有设置 Access-Control-Allow-Origin. 话句话说, 就是用来处理 script, image 等的请求的. 他是 mode 的默认值.
+cors: 用来发送跨域的请求. 在发送请求时, 需要带上.
+cors-with-forced-preflight: 这是专门针对 xhr2 支持出来的 preflight，会事先多发一次请求给 server，检查该次请求的合法性。
+
+credentials 常用取值为：
+
+omit: 发送请求时,不带上 cookie. 默认值.
+same-origin: 发送同域请求时,会带上 cookie.
+include: 只要发送请求,都会带上 cookie.
 
 GET and POST:
 GET用来请求资源，参数在url上,有限制
@@ -82,7 +99,44 @@ exec('tasklist', function(err, stdout, stderr) {
 */
 
 /* 6.监控js性能，报错
-使用window.onerror = function() {}来搜集错误
+使用window.onerror = function() {}来搜集错误 但当执行的js代码和我们的站点在不同域即跨域时，由于浏览器的安全限制，onerror()方法只能捕获到一个固定的错误代码Script error.
+使用try{...}catch(e){...}包裹需要执行的代码，获取error对象的属性定位错误并上报
+
+access-control-allow-orgin 配置问题：
+由于值不能设置多值，而且设置 * , 允许任何域名使用是一个很不安全的设置，所以一般会根据 浏览器请求头 refer 或则 orgin ，判断是不是白名单内的域名，是的就响应回对应的域名或则* （响应头不支持返回 *.qq.com），。当然如果cdn只对一个业务服务也可以写死域名
+
+script 标签上面的 crossorigin 配置问题
+1.anonymous（默认）
+不能带cookie
+
+副作用，当 AC 的设置不是 * 或者不等于origin时，js直接不加载
+
+2.use-credentials
+能带上cookie
+
+副作用，当AC的设置不等于origin时，js直接不加载（不支持 *通配符了）
+
+目前只有高级浏览器支持，如果闲麻烦可以使用自带的 try-catch 功能
+切面包裹入口函数， try-catch
+对于基于AMD和jQuery的网站，几乎所有业务函数都是通过回调异步触发的，所以我们只需要将所有异步函数包裹起来就可以捕获到大部分错误：
+
+setTimeout ,setInterval
+$.event.add 和 $.event.remove
+AJAX
+模块入口 define 或则 require
+setTimeout ,setInterval
+只针对 w3c 现代的浏览器的进行包裹，ie 不进行包裹 #2
+
+$.event.add 和 $.event.remove
+没有个dom 都有这两个方法，我们没有办法对全部重写。但是我们发现目前基本都会使用 jquery 或 zepto ，所以我们对 $.event.add 和 $.event.remove 进行了切面处理。
+
+AJAX
+跟上面的类似，我们不能重写 ajax ，但是前端开发都使用 jquery ，所以我们重写了 $.ajax
+
+模块入口 define 或则 require
+目前前端开发基本都使用了模块化管理，所以模块化的入口是非常好的入口。我们也进行了包裹
+
+
 */
 window.onerror = function (msg, url, lineNo, columnNo, error) {
   var string = msg.toLowerCase();
@@ -447,3 +501,11 @@ library. The only difference is that all the various object references are neste
 （4） 发布，将构建后静态文件发布上线
 （5） 打包，资源路径转换，源码打包
 
+
+那四次分手呢？
+当客户端和服务器通过三次握手建立了TCP连接以后，当数据传送完毕，肯定是要断开TCP连接的啊。那对于TCP的断开连接，这里就有了神秘的“四次分手”。
+
+第一次分手：主机1（可以使客户端，也可以是服务器端），设置Sequence Number和Acknowledgment Number，向主机2发送一个FIN报文段；此时，主机1进入FIN_WAIT_1状态；这表示主机1没有数据要发送给主机2了；
+第二次分手：主机2收到了主机1发送的FIN报文段，向主机1回一个ACK报文段，Acknowledgment Number为Sequence Number加1；主机1进入FIN_WAIT_2状态；主机2告诉主机1，我“同意”你的关闭请求；
+第三次分手：主机2向主机1发送FIN报文段，请求关闭连接，同时主机2进入LAST_ACK状态；
+第四次分手：主机1收到主机2发送的FIN报文段，向主机2发送ACK报文段，然后主机1进入TIME_WAIT状态；主机2收到主机1的ACK报文段以后，就关闭连接；此时，主机1等待2MSL后依然没有收到回复，则证明Server端已正常关闭，那好，主机1也可以关闭连接了。
