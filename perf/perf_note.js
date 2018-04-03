@@ -241,5 +241,132 @@ nodejs进程使用的内存主要在堆（heap）中， 垃圾回收采用分代
 
 实际编码中由于对变量作用域或闭包等使用不当，很可能造成内存的泄漏。在浏览器中由于页面一般情况下只加载一次，或只停留较短的时间，就算有内存泄漏也不会造成很大影响。但在服务端，就算只有一个字节的泄漏，在大量请求和高并发的请求下，泄漏会被放大，随着服务的运行时间越来越长，进程的内存占满，导致内存不足进程退出，就会会对服务器造成很大的影响。
 
+When the browser encounters a <script> tag, it must pause rendering and execute the script immediately. Find scripts that aren't needed for page load and mark them asynchronous or defer their execution to speed up load time.
+
+图片太大可转成svg
+
+loading perf
+rendering perf
+
+Performance is about retaining users
+提高转化率
+
+Migrate to HTTP/2. HTTP/2 addresses many performance problems inherent in HTTP/1.1, such as concurrent request limits and the lack of header compression.
+使用加载提示:
+Preload
+<link rel="preload"> informs the browser that a resource is needed as part of the current navigation, and that it should start getting fetched as soon as possible. Here’s how you use it:
+<link rel="preload" as="script" href="super-important.js">
+<link rel="preload" as="style" href="critical.css">
+Preconnect
+Eliminating Roundtrips with Preconnect
+The "simple" act of initiating an HTTP request can incur many roundtrips before the actual request bytes are routed to the server: the browser may have to resolve the DNS name, perform the TCP handshake, and negotiate the TLS tunnel if a secure socket is required. 
+<link href='https://fonts.gstatic.com' rel='preconnect' crossorigin>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Slab:700|Open+Sans' rel='stylesheet'>
+In the second trace, we add the preconnect hint in our markup indicating that the application will fetch resources from fonts.gstatic.com. As a result, the browser begins the socket setup in parallel with the CSS request, completes it ahead of time, and allows the font requests to be sent immediately! In this particular scenario, preconnect removes three RTTs from the critical path and eliminates over half of second of latency.
+In addition to declaring the preconnect hints via HTML markup, we can also deliver them via an HTTP Link header. 
+
+http2配合webpack codesplitting
+Modern sites ship a lot of JavaScript and CSS on average. It was common to bundle styles and scripts into large bundles in HTTP/1 environments. This was done because a large amount of requests was detrimental to performance. This is no longer the case now that HTTP/2 is on the scene, as multiple, simultaneous requests are cheaper. Consider using code splitting in webpack to limit the amount of scripts downloaded to only what is needed by the current page or view. Separate your CSS into smaller template or component-specific files, and only include those resources where they're likely to be used.
+
+uglify js, svg是基于文本的图像格式，可以用svgo优化
+服务端开启gzip压缩（ Brotli compression 更好）content-encoding: br
+优化图片 ImageOptim, Progressive JPEG, 使用webP(有损压缩)
+Common image optimizations include compression, responsively serving them down based on screen size using <picture>/<img srcset>, and resizing them to reduce image decode costs.
+使用media属性
+<picture>
+ <source srcset="mdn-logo-wide.png" media="(min-width: 600px)">
+ <img src="mdn-logo-narrow.png" alt="MDN">
+</picture>
+
+off-screen and could be lazy-loaded
+
+<picture>
+  <source srcset="/path/to/image.webp" type="image/webp">
+  <img src="/path/to/image.jpg" alt="">
+</picture>
+
+<picture>
+    <source srcset='paul_irish.jxr' type='image/vnd.ms-photo'>
+    <source srcset='paul_irish.jp2' type='image/jp2'>
+    <source srcset='paul_irish.webp' type='image/webp'>
+    <img src='paul_irish.jpg' alt='paul'>
+</picture>
+
+<picture>
+   <source srcset="photo.jxr" type="image/vnd.ms-photo">
+   <source srcset="photo.jp2" type="image/jp2">
+   <source srcset="photo.webp" type="image/webp">
+   <img src="photo.jpg" alt="My beautiful face">
+</picture>
+
+gif转webm
+
+加载优先级
+渐进增强
+define the basic core experience (fully accessible core content for legacy browsers), the enhanced experience (an enriched, full experience for capable browsers) and the extras (assets that aren’t absolutely required and that can be lazy-loaded, such as fonts, carousel scripts, video players, social media buttons)
+
+SPA
+Parsing JavaScript is expensive, so keep it small.With SPAs, you might need some time to initialize the app before you can render the page. Look for modules and techniques to speed up the initial rendering time (it can easily be 2–5x times higher on low-end mobile devices). Thoroughly examine every single JavaScript dependency to see where you are losing initial booting time.
+
+异步加载js async or defer（defer支持ie低版本，async是html5的，尽量用async）
+If you don’t have to worry much about IE 9 and below, then prefer defer to async; otherwise, use async
+<script async src="script.js"></script>
+
+有 async，加载和渲染后续文档元素的过程将和 script.js 的加载与执行并行进行（异步）。
+
+<script defer src="myscript.js"></script>
+
+有 defer，加载后续文档元素的过程将和 script.js 的加载并行进行（异步），但是 script.js 的执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成
+
+限制第三方脚本的影响
+Content Security Policy (CSP) to restrict the impact of third-party scripts, e.g. disallowing the download of audio or video. Embed scripts via iframe, so scripts don't have access to the DOM. Sandbox them, too. 
+内容安全策略 (CSP, Content Security Policy) 是一个附加的安全层，用于帮助检测和缓解某些类型的攻击，包括跨站脚本 (XSS) 和数据注入等攻击
+content-security-policy: script-src https://connect.facebook.net https://cm.g.doubleclick.net https://ssl.google-analytics.com https://graph.facebook.com 
+
+由于服务器指定Cookie后，浏览器的每次请求都会携带Cookie数据，会带来额外的性能开销（尤其是在移动环境下）。新的浏览器API已经允许开发者直接将数据存储到本地，如使用 Web storage API （本地存储和会话存储）或 IndexedDB
+
+当服务器收到HTTP请求时，服务器可以在响应头里面添加一个Set-Cookie选项。浏览器收到响应后通常会保存下Cookie，之后对该服务器每一次请求中都通过Cookie请求头部将Cookie信息发送给服务器。另外，Cookie的过期时间、域、路径、有效期、适用站点都可以根据需要来指定
+Cookie的Secure 和HttpOnly 标记
+
+pv 30000多 per 10min 1 day 300多w
+8w 多crawler 1 day 判断为爬虫跳错误页
+
+traditional performance metrics like load time or DOMContentLoaded time are extremely unreliable since when they occur may or may not correspond to when the user thinks the app is loaded.
+
+ If your website is running over HTTPS, then cache static assets in a service worker cache, and store offline fallbacks (or even offline pages) and retrieve them from the user’s machine, rather than going to the network.
+
+ 动画10ms(16.66)
+ 响应100ms以内
+
+ FP
+ Developers often talk about measurable concepts like Time To Interactivity (TTI) or First Meaningful Paint (FMP) 以用户能看到的时间为准
+ 即能用户能最快看到页面内容，最快地交互
+ First meaningful paint (FMP) 用户最关心的内容
+ task < 100ms
+ The TTI metric identifies the point at which the page's initial JavaScript is loaded and the main thread is idle
+
+ (function detectLongFrame() {
+  var lastFrameTime = Date.now();
+  requestAnimationFrame(function() {
+    var currentFrameTime = Date.now();
+
+    if (currentFrameTime - lastFrameTime > 50) {
+      // Report long frame here...
+    }
+
+    detectLongFrame(currentFrameTime);
+  });
+}());
+
+TTFB:
+Consider hosting your content on a CDN or changing hosting providers.
+Send fewer bytes by optimizing your requests.
+
+webpack:
+webpack.optimize.UglifyJsPlugin()
+{ loader: 'css-loader', options: { minimize: true } },
+When you use ES modules, webpack becomes able to do tree-shaking.
+ Tree-shaking is when a bundler traverses the whole dependency tree, checks what dependencies are used, and removes unused ones. 
+ CommonsChunkPlugin
 
 */

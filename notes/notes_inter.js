@@ -256,6 +256,7 @@ new webpack.optimize.UglifyJsPlugin()
 
 
 /* 10. http 2:
+HTTP/2 允许在单个连接上_复用_下载，所以能够更高效地下载多个小文件
 多路复用：多路复用很好地解决如何让重要资源尽快加载这个问题。同域名下或者不同域但是同时满足同一个IP以
 及使用同一个证书的这两个条件中的所有通信都在单个连接上完成，此连接上同时打开任意数量的双向数据流（ 
 HTTP 1.1 有连接数限制）。使用多域名加上相同的 IP 和证书部署 Web 服务有特殊的意义：让支持 HTTP/2 的
@@ -270,6 +271,7 @@ HTTP/1 中，HTTP 请求和响应都是由「状态行、请求 / 响应头部�
 高优先级的帧发送给客户端
 服务器推送：启动Server Push，意味着服务端可以在发送页面HTML时主动推送其它资源，有自己独立的URL，可以
 被浏览器缓存；如果服务端推送的资源已经被浏览器缓存过，浏览器可以通过发送 RST_STREAM 帧来拒收
+需要小心使用 HTTP/2 推送，因为即使文件已经位于浏览器的本地缓存中或带宽已饱和，它都会对浏览器强制推送数据。如果操作错误，性能将降低。<link rel="preload"> 能够有效地使浏览器对设置这些请求的优先级做出明智的决定
 
 features:
 HTTP and TCP
@@ -314,7 +316,7 @@ concurrency
 -HEADERS and PRIORITY frames
 -it's only a 'suggestion'
 
-HPACK
+HPACK(压缩头部)
 -address the header bloat problem
 -Two primary mechanisms
  -All headers(name=value) are Huffman encoded

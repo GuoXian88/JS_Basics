@@ -3479,6 +3479,7 @@ jQuery.extend( {
 					return state;
 				},
 				always: function() {
+					//不知道传什么参数的情况下用arguments
 					deferred.done( arguments ).fail( arguments );
 					return this;
 				},
@@ -8939,13 +8940,13 @@ jQuery.extend( {
 			s = jQuery.ajaxSetup( {}, options ),
 
 			// Callbacks context
-			callbackContext = s.context || s,
+			callbackContext = s.context || s, //回调的this就是ajax传入的对象，如果对象传入context就是context
 
 			// Context for global events is callbackContext if it is a DOM node or jQuery collection
 			globalEventContext = s.context &&
 				( callbackContext.nodeType || callbackContext.jquery ) ?
 					jQuery( callbackContext ) :
-					jQuery.event,
+					jQuery.event, // ??
 
 			// Deferreds
 			deferred = jQuery.Deferred(),
