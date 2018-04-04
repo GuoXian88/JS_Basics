@@ -166,5 +166,17 @@ React
 
 Units of functionality should be loosely coupled, that is, a unit of functionality should be able to exist on its own, and communication between units should be handled via a messaging system such as custom events or pub/sub. Stay away from direct communication between units of functionality whenever possible.
 
+目前弱项：
+nodejs， 移动端 
+
+如果让你来做好这个页面，要怎么做
+性能优化，提高转化率
+与用户相关的指标， FMP, TTI
+前端定义契约接口不会有安全问题吗?
+你项目中碰到的最大困难是什么
+项目还有优化的空间吗
+如果没有框架要怎么办
+项目架构
+
 
  */
