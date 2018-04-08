@@ -373,4 +373,15 @@ When you use ES modules, webpack becomes able to do tree-shaking.
  XSS:
  最主要的是“>”、“<”
   ' " & < >
+接口字段全部由前端来定义
+是不是会有安全隐患
+1：外部更容易获取数据，因为全是ajax接口化了。
+2：字段命名更容易理解，不用去猜了
+
+如果有一个字段map关系就可以。
+比如ajax返回{a:"",b:""}
+c,d,e....
+然后js压缩一个map表
+
+
 */
