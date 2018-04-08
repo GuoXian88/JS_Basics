@@ -14,13 +14,13 @@ const App = () => {
     try { throw new Error('ssssss') } catch(e) {}
 
     return (
-    <div>
-        <h1>React Component</h1>
-        <Modal />
-        <CityPicker />
-        <ShakeInput />
-    </div>
-)};
+        <div>
+            <h1>React Component</h1>
+            <Modal />
+            <CityPicker />
+            <ShakeInput />
+        </div>
+    )};
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

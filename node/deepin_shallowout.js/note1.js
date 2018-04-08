@@ -35,8 +35,11 @@ Node面向网络，擅长并行io
 
 CH2 模块机制
 Node缓存的是编译执行后的对象
+文件寻址，类似原型链往上找node_modules,没找到读package.json的main字段
+跨平台是通过libuv来实现的　nodejs --> libuv --> windows/linux
 
-
+http://craftinginterpreters.com/introduction.html
+Love this. I think a lot of my success can be attributed to fearlessness when diving into lower levels.
 
 
 
