@@ -35,11 +35,50 @@ Node面向网络，擅长并行io
 
 CH2 模块机制
 Node缓存的是编译执行后的对象
-文件寻址，类似原型链往上找node_modules,没找到读package.json的main字段
-跨平台是通过libuv来实现的　nodejs --> libuv --> windows/linux
+文件寻址，类似原型链往上找node_modules,没找到JSON.parse package.json的main字段
+跨平台是通过libuv/V8来实现的　nodejs --> libuv --> windows/linux
 
 http://craftinginterpreters.com/introduction.html
 Love this. I think a lot of my success can be attributed to fearlessness when diving into lower levels.
+
+
+module --> package
+
+CommonJS规范
+package.json package描述
+bin 二进制可执行文件
+lib js
+doc 文档
+test 测试用例
+
+
+npm install -g 是安装在一个统一的目录下,这个目录如下：
+*/
+const path = require('path')
+path.resolve(process.execPath, '..', '..', 'lib', 'node_modules')
+//C:\Program Files\lib\node_modules
+
+// npm config set registry http://registry.url
+
+/*
+CommonJS --> AMD:
+声明的时候指定所有依赖
+define(id?, dependencies?, factory)
+
+define(['dep1', 'dep2'], function(dep1, dep2) {
+    return function() {}
+})
+
+
+CommonJS --> CMD:
+动态引入模块
+
+define(function(require, exports, module) {
+    调用require引入
+})
+
+
+*/
 
 
 
