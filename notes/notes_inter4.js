@@ -271,8 +271,6 @@ url的修改与文件内容关联 href="a.css?v=0abc23" 只有当文件内容改
 
 
 
-
-
 不需要登录的可供开放性的用户访问的页面，就要考虑seo
 一句话：没有太多个性化内容的页面。
 填写页是属于个性化比较强的页面，比如订单号
@@ -284,9 +282,42 @@ url的修改与文件内容关联 href="a.css?v=0abc23" 只有当文件内容改
 seo的目的 就是便于url被收录，只要你的url符合爬虫的最佳规范，则就利于收录
 
 
+this.setState要取到新的this.state可以用setTimeout
+跨域问题CORS的原理， 有两层拦截，一层是浏览器，一层是后台
+es5怎么实现es6-promise, promise解决了什么问题，api, 解耦，callback hell, 链式调用(continuous passing style)
+https加密算法，公钥私钥证书
+http请求是有数目限制的，怎么突破，除了多域名还有其他方式吗
+css实现2列布局
+浮动和定位的关系
+清除浮动
+css3 animation
+移动端通过获取设备分辨率再用rem来进行响应式布局
+行内元素
+css游览器兼容问题，js浏览器兼容问题
+prototype的优点和缺点
+为什么有class
+prototype与this.p有啥区别
+webpack多页面，多入口怎么让每个页面访问到对应输出的js, js如果经过md5呢
+Object.assign可以深拷贝吗
+深拷贝的几种方式
+ref可以调用子组件的方法
+js遍历dom树
+构建速度优化
+redux的状态是只读的吗
+redux是深比较还是浅比较
+mobx
+
 
 
 
 
 
  */
+(function(){console.log(this)})(); //window
+
+export const mapCopy = (object, callback) => {
+  return Object.keys(object).reduce(function (output, key) {
+    output[key] = callback.call(this, object[key]);
+    return output;
+  }, {});
+}
