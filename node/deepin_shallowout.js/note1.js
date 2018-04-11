@@ -83,8 +83,57 @@ async io
 线程和执行线程上下文切换的开销比较大, 还有业务层面的lock,sync问题
 在最初的开发中，为了降低Node端的开发和运营成本，我们极力避免在Node服务中“掺合”过多的业务逻辑。经过几个项目的实践，最后“约定”在Node服务中我们仅仅做三件事：数据代理、路由分发和服务端渲染
 
+
+技术是基础，应对是层面，人际是手段，站对边最重要
+
+事件循环，观察者，请求对象，io线程池
+轮询
+epoll/kqueue 休眠-->事件通知,执行回调
+
+*/
+//eventloop 生产者消费者模型
+
+while(true) {
+    //event
+    //怎么判断有事件需要处理? Observer --> EventEmmitter
+}
+
+/*
+请求对象用于保存中间状态
+process.nextTick()属于idle观察者, setImmediate()属于check观察者
+idle>io>check
+
+后续传递的程序编写将函数的业务重点从返回值转移到了callback中
+事件处理方式是通过高阶函数的特性来完成
+
 */
 
+var isType = function istype(type) {
+    return function (obj) {
+        return toString.call(obj) == `[object ${type}]`
+    }
+}
+
+var isString = isType('String')
+
+_.after = function(times, fn) {
+    if(times <= 0) {
+        return fn()
+    }
+    //内部函数返回close掉当时传入的参数times和fn
+    return function() {
+        if(--times < 1) {
+            return fn.apply(this, arguments)
+        }
+    }
+}
+
+//try...catch 不能抓异步错
+
+/*web workers可以有效使用多核cpu
+发布订阅模式可用于解耦业务逻辑，数据通过message passing
+
+*/
 
 
 
