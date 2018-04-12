@@ -1,7 +1,7 @@
 'use strict';
-
+// shortcut
 var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
+  , prefix = '~'; //安全性考虑
 
 /**
  * Constructor to create a storage for our `EE` objects.
@@ -20,7 +20,8 @@ function Events() {}
 // overridden or used as an attack vector.
 //
 if (Object.create) {
-  Events.prototype = Object.create(null);
+  Events.prototype = Object.create(null); //这种方式不会继承Object.prototype
+  // o = {} is equal to o = Object.create(Object.prototype)
 
   //
   // This hack is needed because the `__proto__` property is still inherited in
@@ -38,7 +39,7 @@ if (Object.create) {
  * @constructor
  * @private
  */
-function EE(fn, context, once) {
+function EE(fn, context, once) { //save fn and its context
   this.fn = fn;
   this.context = context;
   this.once = once || false;
@@ -48,11 +49,11 @@ function EE(fn, context, once) {
  * Add a listener for a given event.
  *
  * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
- * @param {(String|Symbol)} event The event name.
+ * @param {(String|Symbol)} event The event name. //what is Symbol?
  * @param {Function} fn The listener function.
  * @param {*} context The context to invoke the listener with.
  * @param {Boolean} once Specify if the listener is a one-time listener.
- * @returns {EventEmitter}
+ * @returns {EventEmitter}  CPS风格
  * @private
  */
 function addListener(emitter, event, fn, context, once) {
@@ -64,8 +65,8 @@ function addListener(emitter, event, fn, context, once) {
     , evt = prefix ? prefix + event : event;
 
   if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
-  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
-  else emitter._events[evt] = [emitter._events[evt], listener];
+  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener); // ?
+  else emitter._events[evt] = [emitter._events[evt], listener]; // ?
 
   return emitter;
 }

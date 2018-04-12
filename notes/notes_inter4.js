@@ -281,6 +281,7 @@ url的修改与文件内容关联 href="a.css?v=0abc23" 只有当文件内容改
 静态和动态，只是为了降低服务器压力，和seo无关
 seo的目的 就是便于url被收录，只要你的url符合爬虫的最佳规范，则就利于收录
 
+uv 3000 per minute
 
 this.setState要取到新的this.state可以用setTimeout
 跨域问题CORS的原理， 有两层拦截，一层是浏览器，一层是后台

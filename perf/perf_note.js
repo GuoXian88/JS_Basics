@@ -382,8 +382,9 @@ When you use ES modules, webpack becomes able to do tree-shaking.
 比如ajax返回{a:"",b:""}
 c,d,e....
 然后js压缩一个map表
-
+中间页相当于一层转发，类似nginx代理
 
 
 
 */
+

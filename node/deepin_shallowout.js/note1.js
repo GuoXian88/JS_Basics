@@ -132,11 +132,248 @@ _.after = function(times, fn) {
 
 /*web workers可以有效使用多核cpu
 发布订阅模式可用于解耦业务逻辑，数据通过message passing
+callback可以解耦，高阶函数也可以解耦复用，这都体现了软件工程中的分治思想
+要分解目标循序渐进坚持到底
 
 */
 
+//
+//http
+var options = {
+    host: 'www.example.com',
+    port: 80,
+    path: '/upload',
+    method: 'POST'
+};
+
+var req = http.request(options, function(res) {
+    console.log('STATUS: ' + res.statusCode);
+    console.log('HEADERS: ' + JSON.stringify(res.headers));
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+        console.log('BODY: ' + chunk);
+    });
+
+    res.on('end', function() {
+        //TODO
+    })
+});
+
+req.on('error', function(e) {
+    console.log('error: ' + e.message);
+});
+
+//write data to request body
+
+req.write('data\n');
+req.write('data\n');
+req.end();
+
+
+//how to use EventEmmitter
+
+var proxy = new events.EventEmitter();
+var status = 'ready';
+
+var select = function(callback) {
+    proxy.once('selected', callback);
+    if(status == 'ready') {
+        status = 'pending';
+        db.select('SQL', function(results) {
+            proxy.emit('selected', results);
+            status = 'ready';
+        });
+    }
+}
+
+//
+//async co-operate
+var count = 0;
+var results = {};
+var done = function(key, value) {
+    results[key] = value;
+    count++;
+    if(count == 3) { //哨兵变量
+        render(results);
+    }
+}
+
+fs.readFile(template_path, 'utf8', function(err, template) {
+    done('template', template);
+});
+
+db.query(sql, function(err, data) {
+    done('data', data);
+});
+
+l10n.get(function(err, resources) {
+    done('resources', resources)
+});
+
+
+var done = after(times, render);
+
+
+var emitter = new events.Emitter();
+var done = after(times, render);
+
+emitter.on('done', done);
+emitter.on('done', other);
+
+fs.readFile(template_path, 'utf8', function(err, template) {
+    emitter.on('done', 'template', template);
+});
+
+db.query(sql, function(err, data) {
+    emitter.on('done', 'data', data);
+});
+
+l10n.get(function(err, resources) {
+    emitter.on('done', 'resources', resources);
+});
+
+
+
+/**
+ promise/deferred
+
+ */
+
+
+
+ //
+ //promise
+//promise接收一个函数并执行它(执行异步,并把then的回调传入EventEmitter中保存),当异步完成时调用回调resolve此时会
+//deferred会emit一个success调用EventEmitter中的回调，确保then的回调是EE中的回调应该即可
+ new Promise((resolve, reject) => {
+    fetchJsonp(url, Object.assign({ credentials: 'same-origin' }, extHeader))
+        .then(res => {
+            resolve && resolve({ data: res.json() })
+        }, reason => {
+            reject && reject(reason)
+        })
+})
+
+ var Promise = function() {
+     EventEmitter.call(this);
+ };
+
+ util.inherits(Promise, EventEmitter);
+
+ //then used to cache callbacks wait until async finished emit corresponding event
+ Promise.prototype.then = function(fulfilledHandler, errorHandler, progressHandler) {
+    if(typeof fulfilledHandler === 'function') {
+        //call success only once
+        this.once('success', fulfilledHandler);
+    }
+
+    if(typeof errorHandler === 'function') {
+        this.once('error', errorHandler);
+    }
+
+    if(typeof progressHandler === 'function') {
+        this.on('progress', progressHandler);
+    }
+
+    return this;
+ };
+
+//emit corresponding event on deferred object
+
+var Deferred = function() {
+    this.state = 'unfulfilled';
+    this.promise = new Promise();
+};
+
+Deferred.prototype.resolve = function(obj) {
+    this.state = 'fulfilled';
+    this.promise.emit('success', obj);
+};
+
+Deferred.prototype.reject = function(err) {
+    this.state = 'failed';
+    this.promise.emit('error', err);
+};
+
+Deferred.prototype.progress = function(data) {
+    this.promise.emit('progress', data);
+};
+
+
+var promisify = function() {
+    var deferred = new Deferred();
+    var result = '';
+    res.on('data', function(chunk){
+        result += chunk;
+        deferred.progress(chunk);
+    });
+
+    res.on('end', function() {
+        deferred.resolve(result);
+    });
+
+    res.on('error', function(err){
+        deferred.reject(err);
+    });
+
+    return deferred.promise;
+};
 
 
 
 
+Deferred.prototype.makeNodeResolver = function() {
+    var self = this;
+    return function(error, value) {
+        if(error) {
+            self.reject(error);
+        } else if(arguments.length > 2) {
+            self.resolve(array_slice(arguments, 1));
+        } else {
+            self.resolve(value);
+        }
+    }
+}
 
+
+var readFile = function(file, encoding) {
+    var deferred = Q.defer();
+    fs.readFile(file, encoding, deferred.makeNodeResolver());
+    return deferred.promise;
+};
+
+readFile('foo.txt', 'utf-8').then(function(data){
+
+});
+
+
+Deferred.prototype.all = function() {
+    var count = promises.length;
+    var that = this;
+    var results = [];
+
+    promises.forEach(function(promise, i) {
+        promise.then(function(data) {
+            count--;
+            results[i] = data;
+
+            if(count === 0) {
+                that.resolve(results);
+            }
+        }, function(err) {
+            that.reject(err);
+        })
+    })
+};
+
+
+var promise1 = readFile('foo.txt', 'utf-8');
+var promise2 = readFile('bar.txt', 'utf-8');
+
+var deferred = new Deferred();
+
+deferred.all([promise1, promise2]).then(function(results){
+
+}, function(err){
+
+})
