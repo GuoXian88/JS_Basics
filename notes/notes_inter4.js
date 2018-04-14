@@ -286,8 +286,8 @@ uv 3000 per minute
 this.setState要取到新的this.state可以用setTimeout
 跨域问题CORS的原理， 有两层拦截，一层是浏览器，一层是后台
 es5怎么实现es6-promise, promise解决了什么问题，api, 解耦，callback hell, 链式调用(continuous passing style)
-https加密算法，公钥私钥证书
-http请求是有数目限制的，怎么突破，除了多域名还有其他方式吗
+https加密算法，公钥私钥证书,即有对称加密也有非对称加密
+http请求是有数目限制的，怎么突破，除了域名分区还有其他方式吗
 css实现2列布局
 浮动和定位的关系
 清除浮动
@@ -312,7 +312,6 @@ mobx
 
 
 
-
  */
 (function(){console.log(this)})(); //window
 
@@ -321,4 +320,11 @@ export const mapCopy = (object, callback) => {
     output[key] = callback.call(this, object[key]);
     return output;
   }, {});
+}
+
+//closure
+for(var i=0;i<3;i++) {
+	(function(i) {setTimeout(function(){
+		console.log(i)
+	}, 0)})(i)
 }

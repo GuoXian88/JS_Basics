@@ -1,3 +1,74 @@
+/*
+10 things learned from jq
+
+*/
+
+undefined = true;
+(function(window, document, undefined){ //作为参数传入有利于压缩，局部作用域性能更好
+	if(foo === undefined) // ... 
+})(this, document);
+
+//setInterval问题
+setInterval(function() {
+	doStuff(); //如果这个执行时间大于100ms,这个函数会被一直调用
+}, 100);
+
+(function(){
+	doStuff();
+	setTimeout(arguments.callee, 100);
+})();
+
+(function _loop(){
+	doStuff();
+	setTimeout(_loop, 100);
+})();
+
+//一直更新
+
+(function _loop(){
+	doStuff();
+	$('#update').load('awesomething.php', function() {
+		_loop();
+	});
+})();
+
+//jQuery.onConflict()在最开始保存jQuery然后调用的时候还原
+
+jQuery.fx.speeds.fastopen = ($.browser.msie && $.browser.version < 8 ? 800 : 400);
+$('#stuff').fadeIn('fastopen')
+
+//document.attachEvent('onreadystatechange', DOMContendLoaded)
+
+function doScrollCheck() {
+	if(jQuery.isReady) {
+		return;
+	}
+
+	try {
+		document.documentElement.doScroll('left');
+	} catch(error) {
+		setTimeout( doScrollCheck, 1);
+		return;
+	}
+
+	jQuery.ready();
+}
+
+
+$('#id').find('tage.thing') //更快 命中quick的正则
+
+$('#id tag.thing') //sizzle
+
+var x = eval('(' + data + ')');
+var x = (new Function('return ' + data))();
+
+
+
+
+
+
+
+
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -10333,7 +10404,7 @@ if ( typeof define === "function" && define.amd ) {
 
 
 
-
+//jq命名空间冲突问题，写回来即可
 var
 
 	// Map over jQuery in case of overwrite

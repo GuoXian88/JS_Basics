@@ -125,3 +125,30 @@ read.pipe(write);
  server.listen(8124, function() {
      console.log('server bound');
  });
+
+ /**
+  UDP 无连接，适用于偶尔丢一两数据包也不产生重大影响的场景
+  如音频，视频等，dns是基于它实现的 
+
+  browser是http代理
+
+  HTTP服务与TCP服务区别的地方在于，在开启keepalive后，一个TCP会话可以用于多次请求和响应
+
+  setHeader
+  writeHeader
+
+  connection tcp keep-alive
+  request
+  close
+  websocket: 握手和数据传输
+  TLS/SSL:
+  公钥加密，私钥解密
+  传输前互换公钥，client用服务端公钥，server用客户端公钥
+  中间人攻击
+  数字证书解决CA
+  服务端通过私钥给自己颁发签名证书
+  client证书预装在浏览器
+
+
+
+  */
