@@ -104,6 +104,7 @@ exec('tasklist', function(err, stdout, stderr) {
 
 access-control-allow-orgin 配置问题：
 由于值不能设置多值，而且设置 * , 允许任何域名使用是一个很不安全的设置，所以一般会根据 浏览器请求头 refer 或则 orgin ，判断是不是白名单内的域名，是的就响应回对应的域名或则* （响应头不支持返回 *.qq.com），。当然如果cdn只对一个业务服务也可以写死域名
+Access-Control-Allow-Origin: https://www.google.com,https://www.baidu.com 
 
 script 标签上面的 crossorigin 配置问题
 1.anonymous（默认）
