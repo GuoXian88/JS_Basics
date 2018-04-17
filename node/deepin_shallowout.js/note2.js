@@ -152,3 +152,144 @@ read.pipe(write);
 
 
   */
+
+
+
+function (req, res) {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end();
+}
+
+//dispatch
+function (req, res) {
+    switch (req.method) {
+        case 'POST':
+            update(req, res);
+            break;
+        //...
+        default:
+            break;
+    }
+}
+
+
+var parseCookie = function(cookie) {
+    var cookies = {};
+    if(!cookie) {
+        return cookies;
+    }
+    var list = cookie.split(';');
+    for(var i=0;i<list.length;i++) {
+        var pair = list[i].split('=');
+        cookies[pair[0].trim()] = pair[1];
+    }
+    return cookies;
+}
+
+
+
+//session
+// 1. 基于cookie来实现用户和数据的映射
+// 2. 通过查询字符串来实现数据对应
+var sessions = {};
+var key = 'session_id';
+var EXPIRES = 20*60*1000; // 20 minutes
+
+var generate = function() {
+    var session = {};
+
+    session.id = (+new Date() + Math.random());
+    session.cookie = {
+        expire: (+new Date()) + EXPIRES
+    };
+    sessions[session.id] = session;
+    return session;
+};
+
+//session不能跨进程共享(node进程间不共享),采用第三方缓存redis, memcache etc.
+
+
+//XSS
+$('#box').html(location.hash.replace('#', ''));
+
+//http://a.com/pathname#<script src="b.com/c.js"></script>
+//条件请求If-Modified-Since: Last-Modified. ETag: If-None-Match
+
+
+function(req, res) {
+    if(hasBody(req)) {
+        req.on('data', function(chunk) {
+            buffers.push(chunk);
+        });
+
+        req.on('end', function() {
+            req.rawBody = Buffer.concat(buffers).toString();
+            handle(req, res);
+        });
+    } else {
+        handle(req, res);
+    }
+}
+
+
+/*MVC
+C:路由解析，根据url寻找对应控制器的行为
+M:行为调用相关的模型，进行数据操作
+V:数据操作结束后，调用视图和相关数据进行页面渲染，输出到Client
+
+RESTful：通过url设计资源、请求方法定义资源的操作，通过Accept决定资源的表现形式
+
+
+middleware:简化和隔离基础设施与业务逻辑之间的细节，让开发者关注业务的开发
+
+*/
+
+
+app.use('/user/:username', querystring, cookie, session, function(req, res){
+    
+});
+
+var querystring = function(req, res, next) {
+    req.query = url.parse(req.url, true).query;
+    next();
+};
+
+
+var cookie = function(req, res, next) {
+    var cookie = req.headers.cookie;
+    var cookies = {};
+    if(cookie) {
+        //set cookies
+    }
+
+    req.cookies = cookies;
+    next();
+}
+
+app.use = function(path) {
+    var handle = {
+        path: pathRegexp(path),
+
+        stack:[].slice.call(arguments, 1)
+    };
+    routes.all.push(handle);
+}
+
+//MIME值, json为application/json ,xml为application/xml
+
+
+var redirect = function(url) {
+    res.setHeader('Location', url);
+    res.writeHead(302);
+    res.end('Redirect to ' + url);
+}
+
+//模板要考虑xss问题
+
+
+  
+/**
+ 工程化 ： 项目的组织能力
+ Makefile
+ */
+

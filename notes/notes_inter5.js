@@ -158,7 +158,7 @@ function Shape() {
 
 // typeof [] // "object"
 
-//cookie api
+//cookie api. cookie大部分情况下是用来登录用的
 /*HTTP Cookie（也叫Web Cookie或浏览器Cookie）是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。通常，它用于告知服务端两个请求是否来自同一浏览器，如保持用户的登录状态。Cookie使基于无状态的HTTP协议记录稳定的状态信息成为了可能
 
 Cookie主要用于以下三个方面：
