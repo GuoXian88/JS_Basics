@@ -1,4 +1,3 @@
-
 /*细细的滚动条*/
 &::-webkit-scrollbar {
     width: 3px;
@@ -138,13 +137,15 @@ css引入伪类和伪元素概念是为了格式化文档树以外的信息。�
 
 CSS3规范中的要求使用双冒号(::)表示伪元素，以此来区分伪元素和伪类，比如::before和::after等伪元素使用双冒号(::)，:hover和:active等伪类使用单冒号(:)
 
+translate 50%是相对于自身的
+<div class="bg" :style="{transform:'translate3d(50%,-'+moveX+'px,0)',opacity:bg_opacity}"></div>
 
 */
 
 .clear:after {
-    content: '.';
+    content: ".";
     height: 0;
     visibility: hidden;
-    display:block;
-    clear: both
+    display: block;
+    clear: both;
 }

@@ -172,7 +172,27 @@ nodejs， 移动端
 如果让你来做好这个页面，要怎么做
 性能优化，提高转化率
 与用户相关的指标， FMP, TTI
-前端定义契约接口不会有安全问题吗?
+前端定义契约接口不会有安全问题吗?数据是明文传输，容易被窃取
+
+所以分为请求参数和响应参数： 
+- 请求参数中包含用户隐私的字段参数，如：登陆接口的密码字段，需要进行加密传输，避免被代理捕捉请求后获取明文密码。
+
+响应参数中包含用户隐私的字段数据，需要加*号。如：手机号，身份证，用户邮箱，支付账号，邮寄地址等。
+ "phone":"150*****000",
+ "idCard":"3500**********0555",  
+ "email":"40*****00@qq.com"     
+}
+1
+2
+3
+4
+客户端和服务器通过约定的算法，对传递的参数值进行签名匹配，防止参数在请求过程中被抓取篡改
+保护接口的方式最基本的是SSL/TLS，然后呢：
+
+对称加密的方式
+非对称加密的方式
+动态秘钥
+
 你项目中碰到的最大困难是什么
 项目还有优化的空间吗
 如果没有框架要怎么办
@@ -313,18 +333,22 @@ mobx
 
 
  */
-(function(){console.log(this)})(); //window
+(function() {
+    console.log(this);
+})(); //window
 
 export const mapCopy = (object, callback) => {
-  return Object.keys(object).reduce(function (output, key) {
-    output[key] = callback.call(this, object[key]);
-    return output;
-  }, {});
-}
+    return Object.keys(object).reduce(function(output, key) {
+        output[key] = callback.call(this, object[key]);
+        return output;
+    }, {});
+};
 
 //closure
-for(var i=0;i<3;i++) {
-	(function(i) {setTimeout(function(){
-		console.log(i)
-	}, 0)})(i)
+for (var i = 0; i < 3; i++) {
+    (function(i) {
+        setTimeout(function() {
+            console.log(i);
+        }, 0);
+    })(i);
 }
