@@ -19,6 +19,26 @@ A B will select any B that are inside A, even if there are other elements betwee
 
 display: inline-block可以不换行
 
+有三种定位方案：
+
+普通：根据对象在文档中的位置进行定位，也就是说对象在呈现树中的位置和它在 DOM 树中的位置相似，并根据其框类型和尺寸进行布局。
+浮动：对象先按照普通流进行布局，然后尽可能地向左或向右移动。
+绝对：对象在呈现树中的位置和它在 DOM 树中的位置不同。
+定位方案是由“position”属性和“float”属性设置的。
+
+如果值是 static 和 relative，就是普通流
+如果值是 absolute 和 fixed，就是绝对定位
+
+static 定位无需定义位置，而是使用默认定位。对于其他方案，网页作者需要指定位置：top、bottom、left、right。
+框的布局方式是由以下因素决定的：
+
+框类型
+框尺寸
+定位方案
+外部信息，例如图片大小和屏幕大小
+
+
+
 1.CSS 三大概念: 浮动 定位 盒模型
 元素加背景，背景会应用于content + padding
 outline绘制在border之上不会影响页面布局

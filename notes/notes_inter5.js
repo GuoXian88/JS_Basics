@@ -209,3 +209,16 @@ function format() {
 console.log(format('aa', 'bb', 'cc'));
 
 
+
+
+/**
+ react 16
+ async rendering
+ 
+ time slicing
+渲染不阻塞主线程
+慢网络情况下是responsive
+异步render使交互不会被渲染卡顿
+suspense
+
+ */

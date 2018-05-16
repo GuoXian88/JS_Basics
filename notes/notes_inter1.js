@@ -83,12 +83,16 @@ http-equiv
 
 css与js优化
 多页面css与js
-浏览器渲染过程：
+
+浏览器渲染过程：这是一个渐进的过程
 处理HTML标记构建DOM树
 处理CSS标记构建CSSOM树
-两个树合并成一个渲染树
-布局layout，计算每个节点的几何信息
+两个树合并成一个渲染树(带有颜色尺寸的矩形)
+布局layout(分配坐标)，计算每个节点的几何信息
 paint将各个节点绘制到屏幕上（最后通过调用操作系统Native GUI的API绘制）
+CSS 框模型描述的是针对文档树中的元素而生成，并根据可视化格式模型进行布局的矩形框
+流布局
+
 
 CSS 的 Rule Tree主要是为了完成匹配并把CSS Rule附加上Rendering Tree上的每个Element。也就是DOM结点。也就是所谓的Frame。
 然后，计算每个Frame（也就是每个Element）的位置，这又叫layout和reflow过程

