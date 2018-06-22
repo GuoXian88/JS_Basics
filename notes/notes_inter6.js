@@ -32,3 +32,35 @@ redux架构数据流
 前端安全问题
 cookie敏感信息加密?
 
+
+SEO
+Tkd 就是网站中三个英文单词（title、keywords、description）的缩写
+<title>这里是标题内容</title>
+<meta name="keywords" content="这里是关键词内容"/>
+<meta name="description" content="这里是描述内容"/>
+标题是可以给用户和访客直接看到的，而网站关键词却是给搜索引擎看的
+
+全站 TKD 部署、URL 规范、robots.txt 文件的检查、H 标签的合理使用，内链与外链的布局方面来做全面的 SEO 诊断并发现其中的问题所在
+页面不要有结构或者逻辑上的混乱
+
+
+技术激情，拥抱变化，有视野，有广度
+相同数据的不同展现可以用HOC
+框架区别
+复杂场景，有挑战的事
+ssr缺点
+ssr优点：
+Difficult to make Multi-page web apps: Sometimes you need to make websites with multiple pages and you want to route to different pages. Yes its possible to do it using Client Side Rendering but you will have to make different configurations, set up React-Router etc. Best thing if you are at all doing Multi-page web-apps with React, go for Server Side Rendering.
+Multiple network requests to the server: This will make your app more slow. Sometimes already loading the data with the page itself makes your web-page load only once and not request multiple times for data using fetch or other alternatives.
+Let the server do the rendering for you: In server side rendering your website will already be rendered in the server and then served. In Client Side rendering, your code will load and then be rendered completely in the browser.
+
+Here are three topics to consider when looking at server-side rendering:
+
+SEO: Rendering server-side helps search engine crawlers find your content, but sometimes Google can find your content without SSR.
+Performance: SSR will usually increase performance for your app, but not always.
+Complexity: Using SSR will increase the complexity of your application, which means less time working on other features and improvements.
+
+
+null instanceof Object // false 所以才有Object.create(null)
+3==true //false
+null == undefined // true

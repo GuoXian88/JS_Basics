@@ -2,28 +2,30 @@
 基于事件驱动的异步架构
 
 */
-fs.readFile('/path', function(err, file){
+fs.readFile("/path", function(err, file) {
     //
-})
+});
 
 //create server
 
-var http = require('http')
-var querystring = require('querystring')
+var http = require("http");
+var querystring = require("querystring");
 
 //listen server request
-http.createServer(function(req, res){
-    var postData = ''
-    req.setEncoding('utf8')
-    //侦听请求的data事件
-    req.on('data', function(trunk){
-        postData += trunk
+http
+    .createServer(function(req, res) {
+        var postData = "";
+        req.setEncoding("utf8");
+        //侦听请求的data事件
+        req.on("data", function(trunk) {
+            postData += trunk;
+        });
+        //侦听请求的end事件
+        req.on("end", function() {
+            res.end(postData);
+        });
     })
-    //侦听请求的end事件
-    req.on('end', function(){
-        res.end(postData)
-    })
-}).listen(8080)
+    .listen(8080);
 
 /*单线程的缺点
 无法利用多核cpu
@@ -54,15 +56,16 @@ test 测试用例
 
 npm install -g 是安装在一个统一的目录下,这个目录如下：
 */
-const path = require('path')
-path.resolve(process.execPath, '..', '..', 'lib', 'node_modules')
+const path = require("path");
+path.resolve(process.execPath, "..", "..", "lib", "node_modules");
 //C:\Program Files\lib\node_modules
 
 // npm config set registry http://registry.url
 
 /*
 CommonJS --> AMD:
-声明的时候指定所有依赖
+requirejs
+声明的时候指定所有依赖,异步加载依赖，回调处理
 define(id?, dependencies?, factory)
 
 define(['dep1', 'dep2'], function(dep1, dep2) {
@@ -71,11 +74,22 @@ define(['dep1', 'dep2'], function(dep1, dep2) {
 
 
 CommonJS --> CMD:
+SeaJS
 动态引入模块
-
+依赖就近，所以一般不在define的参数中写依赖，在factory中写
 define(function(require, exports, module) {
     调用require引入
 })
+
+对依赖的处理不同
+1、AMD推崇依赖前置，在定义模块的时候就要声明其依赖的模块
+2、CMD推崇就近依赖，只有在用到某个模块的时候再去require
+很多人说requireJS是异步加载模块，SeaJS是同步加载模块，这么理解实际上是不准确的，其实加载模块都是异步的，只不过AMD依赖前置，js可以方便知道依赖模块是谁，立即加载，而CMD就近依赖，需要使用把模块变为字符串解析一遍才知道依赖了那些模块，这也是很多人诟病CMD的一点，牺牲性能来带来开发的便利性，实际上解析模块用的时间短到可以忽略
+
+同样都是异步加载模块，AMD在加载模块完成后就会执行改模块，所有模块都加载执行完后会进入require的回调函数，执行主逻辑，这样的效果就是依赖模块的执行顺序和书写顺序不一定一致，看网络速度，哪个先下载下来，哪个先执行，但是主逻辑一定在所有依赖加载完成后才执行
+
+CMD加载完某个依赖模块后并不执行，只是下载而已，在所有依赖模块加载完成后进入主逻辑，遇到require语句的时候才执行对应的模块，这样模块的执行顺序和书写顺序是完全一致的
+
 
 async io
 分布式io昂贵
@@ -93,7 +107,7 @@ epoll/kqueue 休眠-->事件通知,执行回调
 */
 //eventloop 生产者消费者模型
 
-while(true) {
+while (true) {
     //event
     //怎么判断有事件需要处理? Observer --> EventEmmitter
 }
@@ -109,24 +123,24 @@ idle>io>check
 */
 
 var isType = function istype(type) {
-    return function (obj) {
-        return toString.call(obj) == `[object ${type}]`
-    }
-}
+    return function(obj) {
+        return toString.call(obj) == `[object ${type}]`;
+    };
+};
 
-var isString = isType('String')
+var isString = isType("String");
 
 _.after = function(times, fn) {
-    if(times <= 0) {
-        return fn()
+    if (times <= 0) {
+        return fn();
     }
     //内部函数返回close掉当时传入的参数times和fn
     return function() {
-        if(--times < 1) {
-            return fn.apply(this, arguments)
+        if (--times < 1) {
+            return fn.apply(this, arguments);
         }
-    }
-}
+    };
+};
 
 //try...catch 不能抓异步错
 
@@ -140,51 +154,50 @@ callback可以解耦，高阶函数也可以解耦复用，这都体现了软件
 //
 //http
 var options = {
-    host: 'www.example.com',
+    host: "www.example.com",
     port: 80,
-    path: '/upload',
-    method: 'POST'
+    path: "/upload",
+    method: "POST"
 };
 
 var req = http.request(options, function(res) {
-    console.log('STATUS: ' + res.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(res.headers));
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-        console.log('BODY: ' + chunk);
+    console.log("STATUS: " + res.statusCode);
+    console.log("HEADERS: " + JSON.stringify(res.headers));
+    res.setEncoding("utf8");
+    res.on("data", function(chunk) {
+        console.log("BODY: " + chunk);
     });
 
-    res.on('end', function() {
+    res.on("end", function() {
         //TODO
-    })
+    });
 });
 
-req.on('error', function(e) {
-    console.log('error: ' + e.message);
+req.on("error", function(e) {
+    console.log("error: " + e.message);
 });
 
 //write data to request body
 
-req.write('data\n');
-req.write('data\n');
+req.write("data\n");
+req.write("data\n");
 req.end();
-
 
 //how to use EventEmmitter
 
 var proxy = new events.EventEmitter();
-var status = 'ready';
+var status = "ready";
 
 var select = function(callback) {
-    proxy.once('selected', callback);
-    if(status == 'ready') {
-        status = 'pending';
-        db.select('SQL', function(results) {
-            proxy.emit('selected', results);
-            status = 'ready';
+    proxy.once("selected", callback);
+    if (status == "ready") {
+        status = "pending";
+        db.select("SQL", function(results) {
+            proxy.emit("selected", results);
+            status = "ready";
         });
     }
-}
+};
 
 //
 //async co-operate
@@ -193,148 +206,147 @@ var results = {};
 var done = function(key, value) {
     results[key] = value;
     count++;
-    if(count == 3) { //哨兵变量
+    if (count == 3) {
+        //哨兵变量
         render(results);
     }
-}
+};
 
-fs.readFile(template_path, 'utf8', function(err, template) {
-    done('template', template);
+fs.readFile(template_path, "utf8", function(err, template) {
+    done("template", template);
 });
 
 db.query(sql, function(err, data) {
-    done('data', data);
+    done("data", data);
 });
 
 l10n.get(function(err, resources) {
-    done('resources', resources)
+    done("resources", resources);
 });
 
-
 var done = after(times, render);
-
 
 var emitter = new events.Emitter();
 var done = after(times, render);
 
-emitter.on('done', done);
-emitter.on('done', other);
+emitter.on("done", done);
+emitter.on("done", other);
 
-fs.readFile(template_path, 'utf8', function(err, template) {
-    emitter.on('done', 'template', template);
+fs.readFile(template_path, "utf8", function(err, template) {
+    emitter.on("done", "template", template);
 });
 
 db.query(sql, function(err, data) {
-    emitter.on('done', 'data', data);
+    emitter.on("done", "data", data);
 });
 
 l10n.get(function(err, resources) {
-    emitter.on('done', 'resources', resources);
+    emitter.on("done", "resources", resources);
 });
-
-
 
 /**
  promise/deferred
 
  */
 
-
-
- //
- //promise
+//
+//promise
 //promise接收一个函数并执行它(执行异步,并把then的回调传入EventEmitter中保存),当异步完成时调用回调resolve此时会
 //deferred会emit一个success调用EventEmitter中的回调，确保then的回调是EE中的回调应该即可
- new Promise((resolve, reject) => {
-    fetchJsonp(url, Object.assign({ credentials: 'same-origin' }, extHeader))
-        .then(res => {
-            resolve && resolve({ data: res.json() })
-        }, reason => {
-            reject && reject(reason)
-        })
-})
+new Promise((resolve, reject) => {
+    fetchJsonp(
+        url,
+        Object.assign({ credentials: "same-origin" }, extHeader)
+    ).then(
+        res => {
+            resolve && resolve({ data: res.json() });
+        },
+        reason => {
+            reject && reject(reason);
+        }
+    );
+});
 
- var Promise = function() {
-     EventEmitter.call(this);
- };
+var Promise = function() {
+    EventEmitter.call(this);
+};
 
- util.inherits(Promise, EventEmitter);
+util.inherits(Promise, EventEmitter);
 
- //then used to cache callbacks wait until async finished emit corresponding event
- Promise.prototype.then = function(fulfilledHandler, errorHandler, progressHandler) {
-    if(typeof fulfilledHandler === 'function') {
+//then used to cache callbacks wait until async finished emit corresponding event
+Promise.prototype.then = function(
+    fulfilledHandler,
+    errorHandler,
+    progressHandler
+) {
+    if (typeof fulfilledHandler === "function") {
         //call success only once
-        this.once('success', fulfilledHandler);
+        this.once("success", fulfilledHandler);
     }
 
-    if(typeof errorHandler === 'function') {
-        this.once('error', errorHandler);
+    if (typeof errorHandler === "function") {
+        this.once("error", errorHandler);
     }
 
-    if(typeof progressHandler === 'function') {
-        this.on('progress', progressHandler);
+    if (typeof progressHandler === "function") {
+        this.on("progress", progressHandler);
     }
 
     return this;
- };
+};
 
 //emit corresponding event on deferred object
 
 var Deferred = function() {
-    this.state = 'unfulfilled';
+    this.state = "unfulfilled";
     this.promise = new Promise();
 };
 
 Deferred.prototype.resolve = function(obj) {
-    this.state = 'fulfilled';
-    this.promise.emit('success', obj);
+    this.state = "fulfilled";
+    this.promise.emit("success", obj);
 };
 
 Deferred.prototype.reject = function(err) {
-    this.state = 'failed';
-    this.promise.emit('error', err);
+    this.state = "failed";
+    this.promise.emit("error", err);
 };
 
 Deferred.prototype.progress = function(data) {
-    this.promise.emit('progress', data);
+    this.promise.emit("progress", data);
 };
-
 
 var promisify = function() {
     var deferred = new Deferred();
-    var result = '';
-    res.on('data', function(chunk){
+    var result = "";
+    res.on("data", function(chunk) {
         result += chunk;
         deferred.progress(chunk);
     });
 
-    res.on('end', function() {
+    res.on("end", function() {
         deferred.resolve(result);
     });
 
-    res.on('error', function(err){
+    res.on("error", function(err) {
         deferred.reject(err);
     });
 
     return deferred.promise;
 };
 
-
-
-
 Deferred.prototype.makeNodeResolver = function() {
     var self = this;
     return function(error, value) {
-        if(error) {
+        if (error) {
             self.reject(error);
-        } else if(arguments.length > 2) {
+        } else if (arguments.length > 2) {
             self.resolve(array_slice(arguments, 1));
         } else {
             self.resolve(value);
         }
-    }
-}
-
+    };
+};
 
 var readFile = function(file, encoding) {
     var deferred = Q.defer();
@@ -342,10 +354,7 @@ var readFile = function(file, encoding) {
     return deferred.promise;
 };
 
-readFile('foo.txt', 'utf-8').then(function(data){
-
-});
-
+readFile("foo.txt", "utf-8").then(function(data) {});
 
 Deferred.prototype.all = function() {
     var count = promises.length;
@@ -353,27 +362,25 @@ Deferred.prototype.all = function() {
     var results = [];
 
     promises.forEach(function(promise, i) {
-        promise.then(function(data) {
-            count--;
-            results[i] = data;
+        promise.then(
+            function(data) {
+                count--;
+                results[i] = data;
 
-            if(count === 0) {
-                that.resolve(results);
+                if (count === 0) {
+                    that.resolve(results);
+                }
+            },
+            function(err) {
+                that.reject(err);
             }
-        }, function(err) {
-            that.reject(err);
-        })
-    })
+        );
+    });
 };
 
-
-var promise1 = readFile('foo.txt', 'utf-8');
-var promise2 = readFile('bar.txt', 'utf-8');
+var promise1 = readFile("foo.txt", "utf-8");
+var promise2 = readFile("bar.txt", "utf-8");
 
 var deferred = new Deferred();
 
-deferred.all([promise1, promise2]).then(function(results){
-
-}, function(err){
-
-})
+deferred.all([promise1, promise2]).then(function(results) {}, function(err) {});

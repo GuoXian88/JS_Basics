@@ -42,7 +42,7 @@ static 定位无需定义位置，而是使用默认定位。对于其他方案�
 1.CSS 三大概念: 浮动 定位 盒模型
 元素加背景，背景会应用于content + padding
 outline绘制在border之上不会影响页面布局
-width 和 height是指contend的宽高
+width 和 height是指content的宽高
 padding不能为负, margin可以为负
 box-sizing: border-box会把border也计算在内
 普通文档流中的div的margin会叠加（外和内都会）, 取最大的
@@ -126,6 +126,8 @@ z-index: 0 —— 定位元素。 这些元素形成了新的层叠上下文。
 
 
 html语义化
+基本上都是围绕着几个主要的标签，像标题（H1~H6）、列表（li）、强调（strong em）等等
+根据内容的结构化（内容语义化），选择合适的标签（代码语义化）便于开发者阅读和写出更优雅的代码的同时让浏览器的爬虫和机器很好地解析
 
 a. 为了在没有CSS的情况下，页面也能呈现出很好地内容结构、代码结构:为了裸奔时好看；
 
@@ -136,6 +138,16 @@ c. 有利于SEO：和搜索引擎建立良好沟通，有助于爬虫抓取更�
 d. 方便其他设备解析（如屏幕阅读器、盲人阅读器、移动设备）以有意义的方式来渲染网页；
 
 e. 便于团队开发和维护，语义化更具可读性，遵循W3C标准的团队都遵循这个标准，可以减少差异化。
+
+尽可能少的使用无语义的标签div和span；
+在语义不明显时，既可以使用div或者p时，尽量用p, 因为p在默认情况下有上下间距，对兼容特殊终端有利；
+不要使用纯样式标签，如：b、font、u等，改用css设置。
+需要强调的文本，可以包含在strong或者em标签中（浏览器预设样式，能用CSS指定就不用他们），strong默认样式是加粗（不要用b），em是斜体（不用i）；
+使用表格时，标题要用caption，表头用thead，主体部分用tbody包围，尾部用tfoot包围。表头和一般单元格要区分开，表头用th，单元格用td；
+表单域要用fieldset标签包起来，并用legend标签说明表单的用途；
+每个input标签对应的说明文本都需要使用label标签，并且通过为input设置id属性，在lable标签中设置for=someld来让说明文本和相对应的input关联起来。
+
+
 
 
 遵循html标签原本的含义，让机器也能读懂(爬虫或者搜索引擎SEO)
@@ -160,6 +172,15 @@ CSS3规范中的要求使用双冒号(::)表示伪元素，以此来区分伪元
 translate 50%是相对于自身的
 <div class="bg" :style="{transform:'translate3d(50%,-'+moveX+'px,0)',opacity:bg_opacity}"></div>
 
+
+margin和padding的百分比是相对于父元素width的
+
+absolute不会一直继承，所以一般会外面定成relative,里面再absolute
+
+父级div height为0的原因可能是子级元素都脱离文档流如absolute或者float
+
+fixed定位相对viewport，如react-portal这种需要fixed定位挂到body下
+translate(-50%, -50%)才能真正居中
 */
 
 .clear:after {

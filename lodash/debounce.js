@@ -282,3 +282,17 @@ $(window).on('scroll', function() {
 
 // RIGHT
 $(window).on('scroll', _.debounce(doSomething, 200));//这个只有一个函数，不会出现上面的情况
+
+
+debounce(action, idle) {
+  var last;
+  return function () {
+    //多次进入调用这个函数的时候会清除保留的同一个timerId last,再重新设置定时函数
+    var ctx = this,
+      args = arguments;
+    clearTimeout(last);
+    last = setTimeout(function () {
+      action.apply(ctx, args);
+    }, idle);
+  };
+}
