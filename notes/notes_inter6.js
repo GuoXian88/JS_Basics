@@ -70,6 +70,7 @@ Ayke van Laëthem has found a more elegant solution in html { margin-left: calc(
 
 跨域的时候会有pre-flight，cors ac header, method, cookie需要with credential
 为什么会有事件代理, 引用减少，消耗内存小，不会有泄漏
+js gc null:object value:null gc原理和类型有关, 如果类型变成null value变成null会gc. 
 事件生命周期，捕获 目标 冒泡
 虚拟dom都利用原生js的documentFragment属性
 
