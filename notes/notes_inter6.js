@@ -68,6 +68,28 @@ null == undefined // true
 
 Ayke van Laëthem has found a more elegant solution in html { margin-left: calc(100vw - 100%); } which works because vw accounts for the scrollbar and % doesn't, and... just read it as there are a few more things you'll need to be aware of anyway.
 
+跨域的时候会有pre-flight，cors ac header, method, cookie需要with credential
+为什么会有事件代理, 引用减少，消耗内存小，不会有泄漏
+事件生命周期，捕获 目标 冒泡
+虚拟dom都利用原生js的documentFragment属性
+
+The event system, at its core, is simply a programming design pattern. The pattern starts with an agreement over a kind of event and:
+
+the name String used for the event,
+the type of the data structure used to represent the key properties of that event, and
+the JavaScript object which will 'emit' that event.
+
+
+函数作用域 this arguments local variables
+匿名函数 this指向 window
+
+长列表优化问题，可以预先渲染visibility:hidden计算出需要渲染的内容位置之后(显示loading)，再移除，然后再加载
+
+thunk middleware 4箭头函数 
+currying的时候怎么判断参数个数，最后执行完的条件是什么
+a(1)(2)(3)()加多一个执行，如果没有参数的话就是执行完，需要返回执行的结果
+
+
 
 jsonp跨域固定callback名字有什么不好?多个跨域请求时怎么执行
 技术深度，框架，工具，亮点，组件
