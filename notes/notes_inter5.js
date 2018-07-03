@@ -221,4 +221,44 @@ console.log(format('aa', 'bb', 'cc'));
 异步render使交互不会被渲染卡顿
 suspense
 
+
+webpack4有啥新东西
+react diff原理
+typeof instanceof toString
+判断数组 instanceof 或者 typeof是不是对象 再看有没有length属性，也可以toString
+class继承是原生的哪种继承
+
+react相关的性能优化
+拖拽组件api怎么设计，怎么优化性能使之流畅(debounce, throttle)
+es6 proxy
+pureComponent
+redux connect实现
+pwa相关，electron, service worker提供离线体验，server push进行推送，可以拖到桌面变成原生应用对接electronJS
+
+线上问题debug，如果是用sourcemap怎么让用户不能看到代码，环境隔离，如部署到cdn的情况下，在调用时指向debug的环境，而不是线上的环境
+
+发布版本控制，发布线上问题如何热更新，java vm 前端热更新再放到vm里面
+国际化，语言，货币这些，用表
+
+preact优化了react不能解决的什么问题
+
+
+前端架构
+业务场景
+性能，
+工程化的东西
+seo
+开发效率
+前后端接口
+安全考虑
+缓存策略
+
+ssr实践一遍，生命周期有哪些
+
+需要去深挖，把一件事情做到极致，比如性能，挖下去的话会是另一个层次
+多深入
+nodejs
+问题是需要场景的，这个场景是需要自己去挖的
+
+
  */
