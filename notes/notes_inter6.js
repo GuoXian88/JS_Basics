@@ -76,3 +76,8 @@ async function可以在constructor里面绑定this
 
 如何把一件事情做到极致 
 深入去挖，考虑各种场景 
+
+
+commmonJS 构建起js的模块系统(解决模块加载先后，依赖的关系，循环引用等问题)
+结合nodejs给js system-level access(file io, manipulate iostream)
+
