@@ -1,3 +1,14 @@
+/**
+ * EventEmitter
+ * 事件对象存储各种key为事件名字的事件_events，为了良好的语义Events{}对象
+ * 注册事件 on/addListener 包含context listener是一个EE{}对象, 包含fn, context
+ * 触发事件emit 同一个事件名字可注册多个事件,触发时同一名字的事件所有事件都要触发
+ * 移除事件
+ */
+
+
+
+
 'use strict';
 // shortcut
 var has = Object.prototype.hasOwnProperty
@@ -39,14 +50,14 @@ if (Object.create) {
  * @constructor
  * @private
  */
-function EE(fn, context, once) { //save fn and its context
+function EE(fn, context, once) { //listener:　save fn and its context
   this.fn = fn;
   this.context = context;
   this.once = once || false;
 }
 
 /**
- * Add a listener for a given event.
+ * Add a listener for a given event.更加通用的辅助函数
  *
  * @param {EventEmitter} emitter Reference to the `EventEmitter` instance.
  * @param {(String|Symbol)} event The event name. //what is Symbol?
@@ -65,8 +76,8 @@ function addListener(emitter, event, fn, context, once) {
     , evt = prefix ? prefix + event : event;
 
   if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
-  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener); // ?
-  else emitter._events[evt] = [emitter._events[evt], listener]; // ?
+  else if (!emitter._events[evt].fn) emitter._events[evt].push(listener); //emitter._events[evt]存在且不是EE的而是一个数组的情况，即有注册多个事件的情况
+  else emitter._events[evt] = [emitter._events[evt], listener]; // 这种应该算是兼容了，保持原来不变，添加新的listener
 
   return emitter;
 }
@@ -78,7 +89,7 @@ function addListener(emitter, event, fn, context, once) {
  * @param {(String|Symbol)} evt The Event name.
  * @private
  */
-function clearEvent(emitter, evt) {
+function clearEvent(emitter, evt) {　//_eventsCount是事件的种类
   if (--emitter._eventsCount === 0) emitter._events = new Events();
   else delete emitter._events[evt];
 }
@@ -91,8 +102,8 @@ function clearEvent(emitter, evt) {
  * @public
  */
 function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
+  this._events = new Events();//简单对象
+  this._eventsCount = 0;//事件种类
 }
 
 /**
@@ -108,7 +119,7 @@ EventEmitter.prototype.eventNames = function eventNames() {
     , name;
 
   if (this._eventsCount === 0) return names;
-
+  //避免过多的this._events
   for (name in (events = this._events)) {
     if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
   }
@@ -173,8 +184,9 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
     , len = arguments.length
     , args
     , i;
-
-  if (listeners.fn) {
+  //只有一个事件的情况
+  if (listeners.fn) { 
+    //只触发一次 立马释放
     if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
 
     switch (len) {
@@ -185,13 +197,13 @@ EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
       case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
       case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
     }
-
+    //处理比较少出现的超过5个参数的情况
     for (i = 1, args = new Array(len -1); i < len; i++) {
       args[i - 1] = arguments[i];
     }
 
     listeners.fn.apply(listeners.context, args);
-  } else {
+  } else { //多个事件一你情况
     var length = listeners.length
       , j;
 
@@ -278,7 +290,7 @@ EventEmitter.prototype.removeListener = function removeListener(event, fn, conte
         (once && !listeners[i].once) ||
         (context && listeners[i].context !== context)
       ) {
-        events.push(listeners[i]);
+        events.push(listeners[i]);//这个删除是返回一个新的数组
       }
     }
 
@@ -332,6 +344,6 @@ EventEmitter.EventEmitter = EventEmitter;
 //
 // Expose the module.
 //
-if ('undefined' !== typeof module) {
+if ('undefined' !== typeof module) { //好的规范字符串常量写前面
   module.exports = EventEmitter;
 }
