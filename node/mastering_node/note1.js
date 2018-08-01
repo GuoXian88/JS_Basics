@@ -196,7 +196,219 @@ process.on("SIGUSR1", () => {
 //eg5 child process
 
 
+//eg6 nextTick IO timer
+const events = require('events');
+function getEmitter() {
+    process.nextTick(() => {
+        emitter.emit('start');
+    });
+    return emitter;
+}
+
+let myEmitter = getEmitter();
+myEmitter.on('start', () => {
+    console.log('started!');
+});
+
+
+
+
+//eg7 ref and unref, unref只剩最后一个timer会清除
+setTimeout(() => {
+    console.log('now stop');
+}, 100);
+
+let intervalId = setInterval(() => {
+    console.log('running');
+}, 1);
+
+intervalId.unref();
+
+
+//eg8
+
+const fs = require('fs');
+const EventEmitter = require('events').EventEmitter;
+
+let pos = 0;
+let messenger = new EventEmitter();
+
+//listener for EventEmitter
+messenger.on('message', msg => {
+    console.log(++pos + ' MESSAGE: ' + msg);
+});
+
+
+// A FIRST
+
+console.log(++pos + ' FIRST');
+
+//B NEXT
+
+process.nextTick(() => {
+    console.log(++pos + ' NEXT');
+});
+
+// C QUICK TIMER
+
+setTimeout(() => {
+    console.log(++pos + ' QUICK TIMER');
+},0);
+
+// D LONG TIMER
+
+setTimeout(() => {
+    console.log(++pos + ' LONG TIMER');
+},10);
+
+// E IMMEDIATE
+
+setImmediate(() => {
+    console.log(++pos + ' IMMEDIATE');
+});
+
+// F MESSAGE HELLO
+
+messenger.emit('message', 'HELLO!');
+
+// G FIRST STAT
+fs.stat(__filename, () => {
+    console.log(++pos + ' FIRST STAT');
+});
+
+
+// H LAST STAT
+
+fs.stat(__filename, () => {
+    console.log(++pos + ' LAST STAT');
+});
+
+// I LAST
+
+console.log(++pos + ' LAST');
+
+
+//eg9 async and await
+
+const { join } = require('path');
+const { promisify } = require('util');
+const fs = require('fs');
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
+
+async function $readDir(dir, acc=[]) {
+    await Promise.all((await readdir(dir)).map(async file => {
+        file = join(dir, file);
+        return (await stat(file)).isDirectory() && acc.push(file) && $readDir(file, acc);
+    }));
+
+    return acc;
+}
+
+$readDir('./changeFilename').then(dirInfo => {
+    console.log(dirInfo);
+});
+
+/*[ 'changeFilename\\a',
+'changeFilename\\c',
+'changeFilename\\a\\b' ]
+*/
+
+
+
+
 
 /*
+async fn return a promise
+
+generator and iterator
+	A	Generator	function	will	yield	a	value	then	stop	but
+the	function	context	of	a	Generator	is	not	disposed	of	(as	it	is	with	normal
+functions).	You	can	re-enter	the	Generator	at	a	later	point	in	time	and	pick	up
+further	results.
+
+	a	Generator	object	exposes	a	next	method,	which	is	used
+to	pull	out	as	many	values	from	a	Generator	as	it	is	willing	to	yield.
+an	Iterator	is	simply	an
+object	with	a	next	method.
+	It	must	do	all	the	work	of	maintaining	its	own
+internal	state	(tracking	idx	in	the	previous	example).	Generators	are	factories	for
+Iterators;	furthermore,	they	do	all	the	work	of	maintaining	and	yielding	their
+own	state.
+
+*/
+
+//eg 10
+function demoIterator(array) {
+    let idx = 0;
+    return {
+        next: () => {
+            return idx < array.length? { value: array[idx++], done:false} : {done: true};
+        }
+    };
+}
+
+let it = demoIterator(['one', 'two', 'three']);
+console.log(it);
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
 
 
+//eg11 一个不好的例子
+function getArraySomehow() {
+    //slice to a copy
+    return ['one','two','three','four','five'].slice(0);
+}
+
+let state = getArraySomehow();
+
+for(let x=0; x < state.length; x++) {
+    console.log(state[x].toUpperCase());
+}
+
+/*This	is	fine,	but	there	are	downsides,	such	as	needing	to	create	a	local	reference
+to	an	external	data	provider	and	maintaining	that	reference	when	this	block	or
+function	terminates.	Do	we	make	state	a	global?	Should	it	be	immutable?	If	the
+underlying	data	changes,	for	example,	a	new	element	is	added	to	the	array,	how
+do	we	make	sure	state	is	updated,	disconnected	as	it	is	from	the	true	state	of	our
+application?	What	if	something	accidentally	overwrites	state?	Data	observation
+and	binding	libraries	exist,	design	theories	exist,	frameworks	exist	to	properly
+encapsulate	your	data	sources	and	inject	immutable	versions	into	execution
+contexts;	but	what	if	there	was	a	better	way?
+*/
+
+//eg12 improved one
+function* liveData(state) {
+    state = ['one','two','three','four','five'];
+    let current;
+
+    while(current = state.shift()) {
+        yield current;
+    }
+}
+
+
+let list = liveData([]);
+let item;
+
+while(item = list.next()) {
+    if(!item.value) {
+        break;
+    }
+
+    console.log('generated:', item.value);
+}
+
+/*
+The	Generator	method	handles	all	the	"boilerplate"	for	sending	back	a	value,	and
+naturally	encapsulates	the	state.	But	there	doesn't	seem	to	be	a	significant
+advantage	here.	This	is	because	we	are	using	a	Generator	to	execute	iterations
+that	run	sequentially	and	immediately.	Generators	are	really	for	situations	when
+a	series	of	values	are	promised,	with	individual	values	being	generated	only
+when	requested,	over	time.	Rather	than	processing	an	array	all	at	once	and	in
+order,	what	we	really	want	to	create	is	a	sequential	chain	of	communicating
+processes,	each	process	"tick"	calculating	a	result	with	visibility	into	previous
+process	results.
+*/
