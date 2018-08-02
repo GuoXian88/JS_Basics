@@ -250,5 +250,6 @@ that is specifically dedicated to handling errors.
 
 
 
-4.debug nodejs 加上node --inspect index.js再加debugger可以
-在chrome里面调试https://nodejs.org/api/debugger.html#debugger_breakpoints
+4.debug nodejs 加上node --inspect-brk index.js
+
+https://nodejs.org/en/docs/guides/debugging-getting-started/
