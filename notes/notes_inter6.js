@@ -105,3 +105,49 @@ commmonJS 构建起js的模块系统(解决模块加载先后，依赖的关系�
 结合nodejs给js system-level access(file io, manipulate iostream)
 
 +"2" // 2
+
+navigation timing api
+Navigation Timing API 可以用于收集客户端性能数据，然后通过 XHR 发送给服务端。还可以计算那些其他方法难以计算的数据，如卸载( unload )上一个页面的时间、域名查找时间、window.onload 的总时间等等。
+计算页面加载所需的总时长：
+
+var perfData = window.performance.timing; 
+var pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+计算请求返回时长：
+
+var connectTime = perfData.responseEnd - perfData.requestStart;
+
+
+
+
+cors缺点，浏览器兼容性
+position fixed兼容性
+position和display有哪些属性，默认值是啥
+position fixed在移动端会有什么问题
+flex布局在移动端的用法
+
+!doctype是什么意思
+html5新增了什么
+es6新增了什么
+js作用域有哪些
+es2017/2018 String.prototype新增了哪些方法 Array.prototype新增了哪些方法
+es6 proxy extends
+基本数据类型，如何判断是数组，怎么把arguments对象转成数组
+数组去重的方法，哪个最快，es6 set的原理
+
+跨域有哪些解决方法, jsonp的原理是什么, jsonp跨域固定callback名字有什么不好?多个跨域请求时怎么执行，cors有什么缺点
+浏览器缓存有哪些，各自的使用场景，存储容量，过期时间等
+
+Navigation Timing API用法
+
+由于我用的React所以有：
+React层面的优化方法有哪些
+react-redux中connect原理
+ssr的优缺点
+设计一个拖拽控件怎么设计，怎么优化性能
+react开发中碰到哪些要调试到源码的问题，怎么解决的
+
+还夹杂一些hr之类的问题:
+为什么换工作
+觉得自己有什么缺点
+为什么选择阿里
+和产品/后台意见不一致怎么办
