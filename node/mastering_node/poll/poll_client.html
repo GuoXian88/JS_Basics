@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hello, Poll</title>
+</head>
+<body>
+
+    <div id="app">
+        <ul id="results"></ul>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        function longPoll() {
+            $.get('http://localhost:2112/poll', data => {
+                $('<li>' + data + '</li>').appendTo('#results');
+                longPoll();
+            });
+        }
+
+        longPoll();
+    </script>
+</body>
+</html>
